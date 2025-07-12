@@ -43,4 +43,11 @@ export class UsersService {
   public async findUserByEmail(email: string) {
     return await this.findUserByEmailProvider.findOneByEmail(email);
   }
+
+  /**
+   * find user by id
+   */
+  public async findUserByUserId(id: number) {
+    return await this.findUserByEmailProvider.findUserById(id);
+  }
 }
