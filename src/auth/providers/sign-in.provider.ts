@@ -12,6 +12,8 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigType } from '@nestjs/config';
 import JwtConfig from '../config/jwtConfig';
 import jwtConfig from '../config/jwtConfig';
+import { CreateUsersDto } from '../../users/dtos/create-users.dto';
+import { ActiveUserData } from '../interfaces/active-user-data.interface';
 
 @Injectable()
 export class SignInProvider {
@@ -34,7 +36,7 @@ export class SignInProvider {
   ) {}
 
   public async signIn(signInDto: SigninDto) {
-    let user = await this.usersService.findUserByEmail(signInDto.email);
+    const user = await this.usersService.findUserByEmail(signInDto.email);
 
     let isPasswordValid: boolean = false;
 
@@ -57,7 +59,7 @@ export class SignInProvider {
       {
         sub: user.id,
         email: user.email,
-      },
+      } as ActiveUserData,
       {
         secret: this.jwtConfiguration.secret,
         issuer: this.jwtConfiguration.issuer,
@@ -67,5 +69,9 @@ export class SignInProvider {
     );
     //access token object
     return { accessToken };
+  }
+
+  public async signUp(createUserDto: CreateUsersDto) {
+    return this.usersService.userRegistration(createUserDto);
   }
 }
