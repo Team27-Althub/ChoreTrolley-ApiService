@@ -30,6 +30,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  //Enable cors
+  app.enableCors();
+
+  //Add global interceptors
+  //app.useGlobalInterceptors(new DataResponseInterceptor());
   await app.listen(3000);
 }
 
