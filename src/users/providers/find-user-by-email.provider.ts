@@ -20,9 +20,22 @@ export class FindUserByEmailProvider {
   public async findOneByEmail(email: string) {
     let user: User | undefined = undefined;
     try {
-      user = await this.userRepository.findOneBy({
-        email: email,
+      user = await this.userRepository.findOneBy({ email });
+    } catch (error) {
+      throw new RequestTimeoutException(error, {
+        description: 'Could not fetch the user',
       });
+    }
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return user;
+  }
+
+  public async findUserById(id: number) {
+    let user: User | undefined = undefined;
+    try {
+      user = await this.userRepository.findOneBy({ id });
     } catch (error) {
       throw new RequestTimeoutException(error, {
         description: 'Could not fetch the user',
