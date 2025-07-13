@@ -1,5 +1,5 @@
 import {
-  Body,
+  Body, ClassSerializerInterceptor,
   Controller,
   DefaultValuePipe,
   Get,
@@ -7,15 +7,13 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+  Query, UseInterceptors
+} from "@nestjs/common";
 import { CreateUsersDto } from './dtos/create-users.dto';
 import { GetUsersParamDto } from './dtos/get-users-param';
 import { PatchUsersDto } from './dtos/patch-users.dto';
 import { UsersService } from './providers/users.service';
 import { ApiOperation, ApiQuery } from '@nestjs/swagger';
-import { AccessTokenGuard } from '../auth/guards/access-token/access-token.guard';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { AuthType } from '../auth/enums/auth-type.enum';
 import { ActiveUser } from '../auth/decorators/active-user.decorator';
@@ -53,6 +51,7 @@ export class UsersController {
 
   @Post('/signup')
   @Auth(AuthType.None)
+  @UseInterceptors(ClassSerializerInterceptor)
   public userRegistration(@Body() createUsersDto: CreateUsersDto) {
     return this.usersService.userRegistration(createUsersDto);
   }

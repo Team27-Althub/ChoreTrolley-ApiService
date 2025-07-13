@@ -4,6 +4,9 @@ import { ConfigType } from '@nestjs/config';
 import profileConfig from '../config/profile.config';
 import { CreateUserProvider } from './create-user.provider';
 import { FindUserByEmailProvider } from './find-user-by-email.provider';
+import { FindOneByGoogleIdProvider } from './find-one-by-google-id.provider';
+import { CreateGoogleUserProvider } from './create-google-user.provider';
+import { GoogleUser } from '../interfaces/google-user.interface';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +24,14 @@ export class UsersService {
      * Inject FindUserByEmailProvider for proxy pattern
      */
     private readonly findUserByEmailProvider: FindUserByEmailProvider,
+    /**
+     * Inject FindOneByGoogleIdProvider
+     */
+    private readonly findOneByGoogleIdProvider: FindOneByGoogleIdProvider,
+    /**
+     * Create google user provider
+     */
+    private readonly createGoogleUserProvider: CreateGoogleUserProvider,
   ) {}
 
   /**
@@ -49,5 +60,13 @@ export class UsersService {
    */
   public async findUserByUserId(id: number) {
     return await this.findUserByEmailProvider.findUserById(id);
+  }
+
+  public async findOneByGoogleId(googleId: string) {
+    return await this.findOneByGoogleIdProvider.findOneByGoogleId(googleId);
+  }
+
+  public async createGoogleUser(googleUser: GoogleUser) {
+    return await this.createGoogleUserProvider.createGoogleUser(googleUser);
   }
 }
