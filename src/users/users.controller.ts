@@ -1,5 +1,6 @@
 import {
-  Body, ClassSerializerInterceptor,
+  Body,
+  ClassSerializerInterceptor,
   Controller,
   DefaultValuePipe,
   Get,
@@ -7,13 +8,14 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query, UseInterceptors
-} from "@nestjs/common";
+  Query,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CreateUsersDto } from './dtos/create-users.dto';
 import { GetUsersParamDto } from './dtos/get-users-param';
 import { PatchUsersDto } from './dtos/patch-users.dto';
 import { UsersService } from './providers/users.service';
-import { ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { AuthType } from '../auth/enums/auth-type.enum';
 import { ActiveUser } from '../auth/decorators/active-user.decorator';
@@ -25,6 +27,7 @@ export class UsersController {
 
   @Get('/:id')
   @ApiOperation({ summary: 'Get user by id' })
+  @ApiBearerAuth()
   @ApiQuery({
     name: 'limit',
     type: 'number',

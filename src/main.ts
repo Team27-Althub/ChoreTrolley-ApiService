@@ -18,11 +18,12 @@ async function bootstrap() {
    */
   const config = new DocumentBuilder()
     .setTitle('ChoreTrolly Api')
-    .setDescription('MIIT')
+    .setDescription('API Documentation for house chores')
     .setTermsOfService('')
     .setLicense('', '')
     .addServer('http://localhost:3000')
-    .setVersion('1.0')
+    .addBearerAuth()
+    .setVersion('0.0.1')
     .build();
   /**
    * Instantiate document
