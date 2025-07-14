@@ -5,6 +5,7 @@ import JwtConfig from '../config/jwtConfig';
 import { ConfigType } from '@nestjs/config';
 import { ActiveUserData } from '../interfaces/active-user-data.interface';
 import { User } from '../../users/providers/user.entity';
+import { SignInResponseDto } from '../../users/dtos/response.dto';
 
 @Injectable()
 export class GenerateTokensProvider {
@@ -35,7 +36,7 @@ export class GenerateTokensProvider {
     );
   }
 
-  public async generateTokens(user: User) {
+  public async generateTokens(user: User): Promise<SignInResponseDto> {
     const [accessToken, refreshToken] = await Promise.all([
       //generate access token
       this.signToken<Partial<ActiveUserData>>(
