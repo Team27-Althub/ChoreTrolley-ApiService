@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashingProvider } from '../../auth/providers/hashing.provider';
+import { MailService } from '../../mail/providers/mail.service';
 
 @Injectable()
 export class CreateUserProvider {
@@ -24,6 +25,10 @@ export class CreateUserProvider {
      */
     @Inject(forwardRef(() => HashingProvider))
     private readonly hashingProvider: HashingProvider,
+    /**
+     * Mail service injection
+     */
+    private readonly mailService: MailService,
   ) {}
 
   /**
@@ -71,6 +76,15 @@ export class CreateUserProvider {
         },
       );
     }
+
+    //test email notification using mailTrap test account
+    //do not throw error on production should mailTrap fails
+    try {
+      await this.mailService.sendUserWelcome(newUser);
+    } catch (e) {
+      throw new RequestTimeoutException(e);
+    }
+
     return newUser;
   }
 }
