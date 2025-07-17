@@ -17,4 +17,7 @@ export default Joi.object({
   JWT_ACCESS_TOKEN_TTL: Joi.number().required(),
   JWT_REFRESH_TOKEN_TTL: Joi.number().required(),
   API_VERSION: Joi.string().required(),
+  MAIL_HOST: Joi.string().required(),
+  SMTP_USERNAME: Joi.string().required(),
+  SMTP_PASSWORD: Joi.string().required(),
 });
