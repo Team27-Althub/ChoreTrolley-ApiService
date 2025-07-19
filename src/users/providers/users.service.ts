@@ -7,6 +7,7 @@ import { FindUserByEmailProvider } from './find-user-by-email.provider';
 import { FindOneByGoogleIdProvider } from './find-one-by-google-id.provider';
 import { CreateGoogleUserProvider } from './create-google-user.provider';
 import { GoogleUser } from '../interfaces/google-user.interface';
+import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
@@ -15,23 +16,23 @@ export class UsersService {
      * Injecting Profile Config
      */
     @Inject(profileConfig.KEY)
-    private profileConfiguration: ConfigType<typeof profileConfig>,
+    private _profileConfiguration: ConfigType<typeof profileConfig>,
     /**
      * Inject CreateUserProvider
      */
-    private readonly createUserProvider: CreateUserProvider,
+    private readonly _createUserProvider: CreateUserProvider,
     /**
      * Inject FindUserByEmailProvider for proxy pattern
      */
-    private readonly findUserByEmailProvider: FindUserByEmailProvider,
+    private readonly _findUserByEmailProvider: FindUserByEmailProvider,
     /**
      * Inject FindOneByGoogleIdProvider
      */
-    private readonly findOneByGoogleIdProvider: FindOneByGoogleIdProvider,
+    private readonly _findOneByGoogleIdProvider: FindOneByGoogleIdProvider,
     /**
      * Create google user provider
      */
-    private readonly createGoogleUserProvider: CreateGoogleUserProvider,
+    private readonly _createGoogleUserProvider: CreateGoogleUserProvider,
   ) {}
 
   /**
@@ -39,7 +40,15 @@ export class UsersService {
    * @param createUserDto
    */
   public async userRegistration(createUserDto: CreateUsersDto) {
-    return this.createUserProvider.userRegistration(createUserDto);
+    return this._createUserProvider.userRegistration(createUserDto);
+  }
+
+  /**
+   * Update user account
+   * @param user
+   */
+  public async updateUserAccount(user: User) {
+    return this._createUserProvider.usersRepository.save(user);
   }
 
   /**
@@ -52,21 +61,45 @@ export class UsersService {
    * @param email
    */
   public async findUserByEmail(email: string) {
-    return await this.findUserByEmailProvider.findOneByEmail(email);
+    return await this._findUserByEmailProvider.findOneByEmail(email);
   }
 
   /**
    * find user by id
    */
   public async findUserByUserId(id: number) {
-    return await this.findUserByEmailProvider.findUserById(id);
+    return await this._findUserByEmailProvider.findUserById(id);
   }
 
   public async findOneByGoogleId(googleId: string) {
-    return await this.findOneByGoogleIdProvider.findOneByGoogleId(googleId);
+    return await this._findOneByGoogleIdProvider.findOneByGoogleId(googleId);
   }
 
   public async createGoogleUser(googleUser: GoogleUser) {
-    return await this.createGoogleUserProvider.createGoogleUser(googleUser);
+    return await this._createGoogleUserProvider.createGoogleUser(googleUser);
+  }
+
+  async verifyActiveOtp(userId: number, token: string) {
+    return this._createUserProvider.verifyActiveToken(userId, token);
+  }
+
+  get profileConfiguration(): ConfigType<typeof profileConfig> {
+    return this._profileConfiguration;
+  }
+
+  get createUserProvider(): CreateUserProvider {
+    return this._createUserProvider;
+  }
+
+  get findUserByEmailProvider(): FindUserByEmailProvider {
+    return this._findUserByEmailProvider;
+  }
+
+  get findOneByGoogleIdProvider(): FindOneByGoogleIdProvider {
+    return this._findOneByGoogleIdProvider;
+  }
+
+  get createGoogleUserProvider(): CreateGoogleUserProvider {
+    return this._createGoogleUserProvider;
   }
 }
