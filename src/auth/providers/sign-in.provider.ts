@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   forwardRef,
   Inject,
   Injectable,
+  NotFoundException,
   RequestTimeoutException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -14,16 +16,25 @@ import JwtConfig from '../config/jwtConfig';
 import jwtConfig from '../config/jwtConfig';
 import { CreateUsersDto } from '../../users/dtos/create-users.dto';
 import { GenerateTokensProvider } from './generate-tokens.provider';
+import { RequestTokenDto } from '../../users/dtos/request-token.dto';
+import { OtpType } from '../../otp/types/OtpType';
+import { OtpService } from '../../otp/otp.service';
+import { UserStatus } from '../../users/enums/user-status';
+import { MailService } from '../../mail/providers/mail.service';
 
 @Injectable()
 export class SignInProvider {
   constructor(
     @Inject(forwardRef(() => UsersService))
-    private readonly usersService: UsersService,
+    private readonly _usersService: UsersService,
+    /**
+     * Otp Service
+     */
+    private readonly _otpService: OtpService,
     /**
      * Hashing provider
      */
-    private readonly hashingProvider: HashingProvider,
+    private readonly _hashingProvider: HashingProvider,
     /**
      * Jwt Service
      */
@@ -36,16 +47,20 @@ export class SignInProvider {
     /**
      * Generate Tokens Provider
      */
-    private readonly generateTokensProvider: GenerateTokensProvider,
+    private readonly _generateTokensProvider: GenerateTokensProvider,
+    /**
+     * Mail service
+     */
+    private readonly _mailService: MailService,
   ) {}
 
   public async signIn(signInDto: SigninDto) {
-    const user = await this.usersService.findUserByEmail(signInDto.email);
+    const user = await this._usersService.findUserByEmail(signInDto.email);
 
     let isPasswordValid: boolean = false;
 
     try {
-      isPasswordValid = await this.hashingProvider.comparePassword(
+      isPasswordValid = await this._hashingProvider.comparePassword(
         signInDto.password,
         user.password,
       );
@@ -59,10 +74,46 @@ export class SignInProvider {
       throw new UnauthorizedException('Invalid password');
     }
 
-    return await this.generateTokensProvider.generateTokens(user);
+    //Check if account is UserStatus.UnVerified
+    if (user.status === UserStatus.UnVerified) {
+      throw new UnauthorizedException(`Account is ${user.status}`);
+    }
+
+    return await this._generateTokensProvider.generateTokens(user);
   }
 
   public async signUp(createUserDto: CreateUsersDto) {
-    return this.usersService.userRegistration(createUserDto);
+    return this._usersService.userRegistration(createUserDto);
+  }
+
+  async otpRequest(requestDto: RequestTokenDto, resetUrl: string) {
+    const { email } = requestDto;
+    const user = await this._usersService.findUserByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    //Send Otp if user exists
+    const otp = await this._otpService.generateToken(user, OtpType.RESET_LINK);
+
+    try {
+      const urlReset = `${resetUrl}${otp}`;
+      await this._mailService.sendUserWelcome(user, otp, urlReset);
+    } catch (e) {
+      throw new RequestTimeoutException(e);
+    }
+    return otp;
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const userId = await this._otpService.validatedResetToken(token);
+    const userExist = await this._usersService.findUserByUserId(userId);
+
+    if (!userExist) {
+      throw new BadRequestException('User not found');
+    }
+    //hash the new password
+    userExist.password = await this._hashingProvider.hashPassword(newPassword);
+    return await this._usersService.updateUserAccount(userExist);
   }
 }

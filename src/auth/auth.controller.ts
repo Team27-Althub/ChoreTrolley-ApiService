@@ -4,8 +4,10 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Inject,
   Post,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './providers/auth.service';
 import {
@@ -13,20 +15,31 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiResponse,
-  ApiTags
-} from "@nestjs/swagger";
+  ApiTags,
+} from '@nestjs/swagger';
 import { SigninDto } from './dtos/signin.dto';
 import { Auth } from './decorators/auth.decorator';
 import { AuthType } from './enums/auth-type.enum';
 import { CreateUsersDto } from '../users/dtos/create-users.dto';
 import { RefreshTokenDto } from './dtos/refresh-token.dto';
 import { SignInResponseDto } from '../users/dtos/response.dto';
+import { RequestTokenDto } from '../users/dtos/request-token.dto';
+import jwtConfig from './config/jwtConfig';
+import { ConfigType } from '@nestjs/config';
+import JwtConfig from './config/jwtConfig';
 
 @Controller('auth')
+@Auth(AuthType.None)
 @ApiTags('Auth Section')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly _authService: AuthService,
+    /**
+     * Jwt Configuration
+     */
+    @Inject(jwtConfig.KEY)
+    private readonly _jwtConfiguration: ConfigType<typeof JwtConfig>,
+  ) {}
 
   @Post('sign-in')
   @Auth(AuthType.None)
@@ -41,7 +54,7 @@ export class AuthController {
     description: 'Bad payload sent',
   })
   public async signIn(@Body() signInDto: SigninDto) {
-    return this.authService.signIn(signInDto);
+    return this._authService.signIn(signInDto);
   }
 
   @Post('refresh-token')
@@ -56,7 +69,7 @@ export class AuthController {
     description: 'Bad payload sent',
   })
   public async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshToken(refreshTokenDto);
+    return this._authService.refreshToken(refreshTokenDto);
   }
 
   @Auth(AuthType.None)
@@ -69,6 +82,23 @@ export class AuthController {
     description: 'Bad payload sent',
   })
   public userRegister(@Body() registerRequest: CreateUsersDto) {
-    return this.authService.signUp(registerRequest);
+    return this._authService.signUp(registerRequest);
+  }
+
+  @Post('forgot-password')
+  @Auth(AuthType.None)
+  async forgotPassword(@Body() requestDto: RequestTokenDto) {
+    const resetUrl = `${this._jwtConfiguration.resetUrl}?token=`;
+    return this._authService.otpRequest(requestDto, resetUrl);
+  }
+
+  @Post('reset-password')
+  @Auth(AuthType.None)
+  @UseInterceptors(ClassSerializerInterceptor)
+  async resetPassword(
+    @Body(new ValidationPipe({ transform: true }))
+    { token, password }: { token: string; password: string },
+  ) {
+    return this._authService.resetPassword(token, password);
   }
 }

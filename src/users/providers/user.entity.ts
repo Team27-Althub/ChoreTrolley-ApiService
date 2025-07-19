@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Exclude } from "class-transformer";
+import { Exclude } from 'class-transformer';
+import { UserStatus } from '../enums/user-status';
 
 @Entity('users')
 export class User {
@@ -35,6 +36,13 @@ export class User {
   })
   @Exclude()
   password?: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserStatus,
+    default: UserStatus.UnVerified,
+  })
+  status: UserStatus;
 
   @Column({
     type: 'varchar',

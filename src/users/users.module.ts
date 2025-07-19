@@ -15,7 +15,13 @@ import { CreateGoogleUserProvider } from './providers/create-google-user.provide
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, CreateUserProvider, FindUserByEmailProvider, FindOneByGoogleIdProvider, CreateGoogleUserProvider],
+  providers: [
+    UsersService,
+    CreateUserProvider,
+    FindUserByEmailProvider,
+    FindOneByGoogleIdProvider,
+    CreateGoogleUserProvider,
+  ],
   exports: [UsersService],
   imports: [
     TypeOrmModule.forFeature([User]),
