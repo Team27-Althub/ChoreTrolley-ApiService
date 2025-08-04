@@ -24,7 +24,7 @@ import { MailModule } from './mail/mail.module';
 import { OtpModule } from './otp/otp.module';
 import { Otp } from './otp/entities/otp.entity';
 
-const ENV = process.env.NODE_ENV || 'development';
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
@@ -50,6 +50,15 @@ const ENV = process.env.NODE_ENV || 'development';
         password: configService.get<string>('database.password'),
         autoLoadEntities: configService.get('database.autoloadEntities'),
         synchronize: configService.get<boolean>('database.synchronize'),
+        ssl: configService.get<boolean>('database.ssl'),
+        extra:
+          process.env.DATABASE_SSL === 'true'
+            ? {
+                ssl: {
+                  rejectUnauthorized: false, // for Render, Heroku, or self-signed certs
+                },
+              }
+            : {},
       }),
     }),
     ConfigModule.forFeature(jwtConfig),
