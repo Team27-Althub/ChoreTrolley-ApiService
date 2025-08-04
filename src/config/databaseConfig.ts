@@ -8,4 +8,5 @@ export default registerAs('database', () => ({
   port: parseInt(process.env.DATABASE_PORT) || 5432,
   synchronize: process.env.DATABASE_SYNC === 'true',
   autoloadEntities: process.env.DATABASE_AUTOLOAD_ENTITIES === 'true',
+  ssl: process.env.DATABASE_SSL === 'true',
 }));
