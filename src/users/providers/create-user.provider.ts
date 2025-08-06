@@ -11,6 +11,10 @@ import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashingProvider } from '../../auth/providers/hashing.provider';
 import { MailService } from '../../mail/providers/mail.service';
+import { OtpService } from '../../otp/otp.service';
+import { OtpType } from '../../otp/types/OtpType';
+import { UserStatus } from '../enums/user-status';
+import * as console from 'node:console';
 
 @Injectable()
 export class CreateUserProvider {
@@ -19,16 +23,20 @@ export class CreateUserProvider {
    */
   constructor(
     @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
+    private readonly _usersRepository: Repository<User>,
     /**
      * circular dependencies
      */
     @Inject(forwardRef(() => HashingProvider))
-    private readonly hashingProvider: HashingProvider,
+    private readonly _hashingProvider: HashingProvider,
     /**
      * Mail service injection
      */
-    private readonly mailService: MailService,
+    private readonly _mailService: MailService,
+    /**
+     * Otp service injection
+     */
+    private readonly _otpService: OtpService,
   ) {}
 
   /**
@@ -40,7 +48,7 @@ export class CreateUserProvider {
 
     try {
       /* check if user exists with email */
-      userExists = await this.usersRepository.findOne({
+      userExists = await this._usersRepository.findOne({
         where: { email: createUserDto.email },
       });
     } catch (error) {
@@ -61,13 +69,15 @@ export class CreateUserProvider {
     /**
      * create new user with hashed password
      */
-    let newUser = this.usersRepository.create({
+    let newUser = this._usersRepository.create({
       ...createUserDto,
-      password: await this.hashingProvider.hashPassword(createUserDto.password),
+      password: await this._hashingProvider.hashPassword(
+        createUserDto.password,
+      ),
     });
 
     try {
-      newUser = await this.usersRepository.save(newUser);
+      newUser = await this._usersRepository.save(newUser);
     } catch (error) {
       throw new RequestTimeoutException(
         'Unable to process your request. try later',
@@ -77,14 +87,44 @@ export class CreateUserProvider {
       );
     }
 
+    //create otp
+    const otp = await this._otpService.generateToken(newUser, OtpType.OTP);
+
     //test email notification using mailTrap test account
     //do not throw error on production should mailTrap fails
     try {
-      await this.mailService.sendUserWelcome(newUser);
+      await this._mailService.sendUserWelcome(newUser, otp);
     } catch (e) {
       throw new RequestTimeoutException(e);
     }
 
     return newUser;
+  }
+
+  async verifyActiveToken(userId: number, token: string) {
+    await this._otpService.verifyOtp(userId, token);
+    const user = await this._usersRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    user.status = UserStatus.Verified;
+    return await this._usersRepository.save(user);
+  }
+
+  get usersRepository(): Repository<User> {
+    return this._usersRepository;
+  }
+
+  get mailService(): MailService {
+    return this._mailService;
+  }
+
+  get otpService(): OtpService {
+    return this._otpService;
   }
 }

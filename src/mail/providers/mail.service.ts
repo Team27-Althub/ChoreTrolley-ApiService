@@ -6,13 +6,13 @@ import { User } from '../../users/providers/user.entity';
 export class MailService {
   /**
    * service sends all email notification/actions
-   * @param mailerService
+   * @param _mailerService
    */
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(private readonly _mailerService: MailerService) {}
 
   //todo: welcome.ejs needs to be designed(inline css)
-  public async sendUserWelcome(user: User) {
-    await this.mailerService.sendMail({
+  public async sendUserWelcome(user: User, otp: string, url?: string) {
+    await this._mailerService.sendMail({
       to: user.email,
       from: `Onboarding Team <no-reply@admin.com>`,
       subject: 'Welcome to ChoreTrolly',
@@ -20,7 +20,8 @@ export class MailService {
       context: {
         name: user.firstName,
         email: user.email,
-        loginUrl: 'hptt://localhost:3000',
+        otp: otp,
+        loginUrl: url,
       },
     });
   }

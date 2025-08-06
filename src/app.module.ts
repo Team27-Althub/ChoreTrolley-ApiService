@@ -21,8 +21,10 @@ import { AccessTokenGuard } from './auth/guards/access-token/access-token.guard'
 import { AuthenticationGuard } from './auth/guards/authentication/authentication.guard';
 import { DataResponseInterceptor } from './common/interceptors/data-reponse/data-response.interceptor';
 import { MailModule } from './mail/mail.module';
+import { OtpModule } from './otp/otp.module';
+import { Otp } from './otp/entities/otp.entity';
 
-const ENV = process.env.NODE_ENV || 'development';
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
@@ -40,7 +42,7 @@ const ENV = process.env.NODE_ENV || 'development';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        entities: [User],
+        entities: [User, Otp],
         port: +configService.get('database.port'),
         host: configService.get<string>('database.host'),
         database: configService.get<string>('database.name'),
@@ -48,11 +50,21 @@ const ENV = process.env.NODE_ENV || 'development';
         password: configService.get<string>('database.password'),
         autoLoadEntities: configService.get('database.autoloadEntities'),
         synchronize: configService.get<boolean>('database.synchronize'),
+        ssl: configService.get<boolean>('database.ssl'),
+        extra:
+          process.env.DATABASE_SSL === 'true'
+            ? {
+                ssl: {
+                  rejectUnauthorized: false, // for Render, Heroku, or self-signed certs
+                },
+              }
+            : {},
       }),
     }),
     ConfigModule.forFeature(jwtConfig),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     MailModule,
+    OtpModule,
   ],
   controllers: [
     AppController,
