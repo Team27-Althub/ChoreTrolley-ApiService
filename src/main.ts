@@ -22,6 +22,7 @@ async function bootstrap() {
     .setTermsOfService('')
     .setLicense('', '')
     .addServer('http://localhost:3000')
+    .addServer('https://choretrolley-apiservice-production.up.railway.app')
     .addBearerAuth()
     .setVersion('0.0.1')
     .build();
