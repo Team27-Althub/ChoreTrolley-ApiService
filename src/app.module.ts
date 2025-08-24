@@ -23,8 +23,14 @@ import { DataResponseInterceptor } from './common/interceptors/data-reponse/data
 import { MailModule } from './mail/mail.module';
 import { OtpModule } from './otp/otp.module';
 import { Otp } from './otp/entities/otp.entity';
+import { ServicesModule } from './services/services.module';
+import { CategoryModule } from './category/category.module';
+import { ReviewModule } from './review/review.module';
+import { Service } from './services/entities/service.entity';
+import { Category } from './category/entities/category.entity';
+import { Review } from './review/entities/review.entity';
 
-const ENV = process.env.NODE_ENV;
+const ENV = process.env.NODE_ENV || 'development';
 
 @Module({
   imports: [
@@ -42,7 +48,7 @@ const ENV = process.env.NODE_ENV;
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        entities: [User, Otp],
+        entities: [User, Otp, Service, Category, Review],
         port: +configService.get('database.port'),
         host: configService.get<string>('database.host'),
         database: configService.get<string>('database.name'),
@@ -65,6 +71,9 @@ const ENV = process.env.NODE_ENV;
     JwtModule.registerAsync(jwtConfig.asProvider()),
     MailModule,
     OtpModule,
+    ServicesModule,
+    CategoryModule,
+    ReviewModule,
   ],
   controllers: [
     AppController,
@@ -86,4 +95,20 @@ const ENV = process.env.NODE_ENV;
     AccessTokenGuard,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly configService: ConfigService) {
+    console.log(
+      '✅ Loaded DB host:',
+      this.configService.get<string>('database.host'),
+    );
+    console.log(
+      '✅ Loaded DB Table:',
+      this.configService.get<string>('database.name'),
+    );
+    console.log('✅ ENV value:', process.env.NODE_ENV);
+    console.log(
+      '✅ Loading env file:',
+      !process.env.NODE_ENV ? '.env' : `.env.${process.env.NODE_ENV}`,
+    );
+  }
+}
