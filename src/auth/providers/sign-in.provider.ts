@@ -78,8 +78,8 @@ export class SignInProvider {
     if (user.status === UserStatus.UnVerified) {
       throw new UnauthorizedException(`Account is ${user.status}`);
     }
-
-    return await this._generateTokensProvider.generateTokens(user);
+    const tokens = await this._generateTokensProvider.generateTokens(user);
+    return { ...tokens, user };
   }
 
   public async signUp(createUserDto: CreateUsersDto) {
