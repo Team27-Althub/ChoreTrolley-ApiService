@@ -16,18 +16,28 @@ import databaseConfig from './config/databaseConfig';
 import environmentValidation from './config/environment.validation';
 import jwtConfig from './auth/config/jwtConfig';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { AccessTokenGuard } from './auth/guards/access-token/access-token.guard';
 import { AuthenticationGuard } from './auth/guards/authentication/authentication.guard';
-import { DataResponseInterceptor } from './common/interceptors/data-reponse/data-response.interceptor';
 import { MailModule } from './mail/mail.module';
 import { OtpModule } from './otp/otp.module';
 import { Otp } from './otp/entities/otp.entity';
+import { ServicesModule } from './services/services.module';
+import { CategoryModule } from './category/category.module';
+import { ReviewModule } from './review/review.module';
+import { Service } from './services/entities/service.entity';
+import { Category } from './category/entities/category.entity';
+import { Review } from './review/entities/review.entity';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { ServiceProvider } from './services/entities/service-provider.entity';
+import { PaginationModule } from './common/pagination/pagination.module';
+import { CoreModule } from './core/core.module';
 
 const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
+    CoreModule,
     UsersModule,
     PostsModule,
     AuthModule,
@@ -42,7 +52,7 @@ const ENV = process.env.NODE_ENV;
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        entities: [User, Otp],
+        entities: [User, Otp, Service, Category, Review, ServiceProvider],
         port: +configService.get('database.port'),
         host: configService.get<string>('database.host'),
         database: configService.get<string>('database.name'),
@@ -65,6 +75,12 @@ const ENV = process.env.NODE_ENV;
     JwtModule.registerAsync(jwtConfig.asProvider()),
     MailModule,
     OtpModule,
+    ServicesModule,
+    CategoryModule,
+    ReviewModule,
+    DashboardModule,
+    PaginationModule,
+    CoreModule,
   ],
   controllers: [
     AppController,
@@ -78,10 +94,6 @@ const ENV = process.env.NODE_ENV;
     {
       provide: APP_GUARD,
       useClass: AuthenticationGuard,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: DataResponseInterceptor,
     },
     AccessTokenGuard,
   ],
