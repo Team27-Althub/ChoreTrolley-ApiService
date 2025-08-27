@@ -11,4 +11,7 @@ export class Category {
 
   @OneToMany(() => Service, (service) => service.category)
   services: Service[];
+
+  @Column({ nullable: true })
+  imageUrl: string;
 }

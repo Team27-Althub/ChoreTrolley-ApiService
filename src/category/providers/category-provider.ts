@@ -14,6 +14,12 @@ export class CategoryProvider {
     return this._repository.find();
   }
 
+  async findCategoriesByLimit(limit: number): Promise<Category[]> {
+    return this._repository.find({
+      take: limit,
+    });
+  }
+
   async findOneById(id: number): Promise<Category> {
     try {
       return await this._repository.findOneBy({ id: id });

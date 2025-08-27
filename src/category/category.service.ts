@@ -10,6 +10,10 @@ export class CategoryService {
     return await this._categoryProvider.findAll();
   }
 
+  async findCategoriesByLimit(limit: number) {
+    return await this._categoryProvider.findCategoriesByLimit(limit);
+  }
+
   async getSingleCategory(categoryId: number): Promise<Category> {
     return await this._categoryProvider.findOneById(categoryId);
   }

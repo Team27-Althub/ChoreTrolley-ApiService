@@ -1,12 +1,14 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Category } from '../../category/entities/category.entity';
 import { Review } from '../../review/entities/review.entity';
+import { ServiceProvider } from './service-provider.entity';
 
 @Entity()
 export class Service {
@@ -42,4 +44,13 @@ export class Service {
 
   @Column()
   serviceType: string; // Full-time, Part-time, On-Demand
+
+  @Column('jsonb', { nullable: true })
+  available_hours: Record<string, string[]>;
+
+  @ManyToOne(() => ServiceProvider, (provider) => provider.services, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'provider_id' })
+  serviceProvider: ServiceProvider;
 }

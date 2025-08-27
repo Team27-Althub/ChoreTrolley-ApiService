@@ -30,7 +30,7 @@ import JwtConfig from './config/jwtConfig';
 
 @Controller('auth')
 @Auth(AuthType.None)
-@ApiTags('Auth Section')
+@ApiTags('Auth Module')
 export class AuthController {
   constructor(
     private readonly _authService: AuthService,
