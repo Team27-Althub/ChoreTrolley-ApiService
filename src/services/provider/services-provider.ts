@@ -15,14 +15,27 @@ import { PaginationProvider } from '../../common/pagination/providers/pagination
 import { Pagination } from '../../common/pagination/interfaces/pagination.interface';
 import { CreateServiceDto } from '../dtos/CreateServiceDto';
 import { CreateServiceProviderDto } from '../dtos/CreateServiceProviderDto';
+import { ServiceProvider } from '../entities/service-provider.entity';
+import { UpdateServiceDto } from '../dtos/UpdateServiceDto';
 
 @Injectable()
 export class ServicesProvider {
   constructor(
     @Inject(forwardRef(() => CategoryService))
     private readonly _categoryService: CategoryService,
+    /**
+     *
+     */
     @InjectRepository(Service)
     private readonly _serviceRepository: Repository<Service>,
+    /**
+     *
+     */
+    @InjectRepository(ServiceProvider)
+    private readonly _serviceProviderRepository: Repository<ServiceProvider>,
+    /**
+     *
+     */
     private readonly _paginationProvider: PaginationProvider,
   ) {}
 
@@ -56,14 +69,59 @@ export class ServicesProvider {
     }
   }
 
+  async updateProvidedService(dto: UpdateServiceDto, id: number) {
+    return await this._serviceRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        // 1. Validate related entities
+        const provider = await transactionalEntityManager.findOne(
+          ServiceProvider,
+          {
+            where: { id: dto.providerId },
+          },
+        );
+
+        if (!provider) {
+          throw new BadRequestException(`Service Provider not found`);
+        }
+
+        const category = await transactionalEntityManager.findOne(Category, {
+          where: { id: dto.categoryId },
+        });
+
+        if (!category) {
+          throw new BadRequestException(`Category not found`);
+        }
+
+        // 2. Preload service (merge existing + dto)
+        const service = await transactionalEntityManager.preload(Service, {
+          id: id,
+          ...dto,
+        });
+
+        if (!service) {
+          throw new BadRequestException(`Unable to update with ${dto.title}`);
+        }
+
+        // 3. Persist safely inside transaction
+        return await transactionalEntityManager.save(Service, service);
+      },
+    );
+  }
+
   async createServiceProvider(dto: CreateServiceProviderDto) {
-    const existingProvider = await this._serviceRepository.findOneBy({
+    const existingProvider = await this._serviceProviderRepository.findOneBy({
       id: dto.id,
     });
     if (existingProvider) {
       throw new BadRequestException('Already existing provider');
     }
-    const serviceProvider = this._serviceRepository.create(dto);
-    return this._serviceRepository.save(serviceProvider);
+    const serviceProvider = this._serviceProviderRepository.create(dto);
+    return this._serviceProviderRepository.save(serviceProvider);
+  }
+
+  async updateServiceProvider() {
+    // const existingProvider = await this._serviceRepository.findOneBy({
+    //   id: dto.id,
+    // });
   }
 }

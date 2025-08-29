@@ -1,10 +1,18 @@
-import { Body, Controller, Get, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ServicesService } from './provider/services.service';
 import { GetServiceFilterQueryDto } from './dtos/GetServicePaginationQueryDto';
 import { CreateServiceDto } from './dtos/CreateServiceDto';
 import { CreateServiceProviderDto } from './dtos/CreateServiceProviderDto';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { SkipResponseWrapper } from '../common/decorators/skip-response.decorator';
+import { UpdateServiceDto } from './dtos/UpdateServiceDto';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('services')
 @ApiTags('Service Module')
@@ -54,12 +62,48 @@ export class ServicesController {
     status: 201,
     description: 'Service provider created successfully',
   })
-  async createServiceProvider(dto: CreateServiceProviderDto) {
+  async createServiceProvider(@Body() dto: CreateServiceProviderDto) {
     return this._services.createServiceProvider(dto);
   }
 
-  @Put('/update')
-  async updateService() {
-    return '';
+  @Put('/update/:id')
+  @ApiOperation({ summary: 'Update existing service' })
+  @ApiResponse({
+    status: 200,
+    description: 'Service successfully updated',
+  })
+  @ApiBody({
+    description: 'Update service request body',
+    type: UpdateServiceDto,
+    examples: {
+      example1: {
+        summary: 'Update service example',
+        value: {
+          title: 'Plumber Painter',
+          description: 'Fix leaking pipes and taps',
+          imageUrl: 'https://image-url.com',
+          price: 20000,
+          priceUnit: 'hr',
+          sponsored: true,
+          categoryId: 1,
+          providerId: 2,
+          serviceType: 'on-demand',
+        },
+      },
+    },
+  })
+  async updateService(
+    @CurrentUser('sub') id: number,
+    @Body() dto: UpdateServiceDto,
+  ) {
+    return this._services.updateProvidedService(dto, id);
+  }
+
+  @Get('/update-provider')
+  async updateServiceProvider(
+    @CurrentUser('sub') id: number,
+    @Body() dto: CreateServiceProviderDto,
+  ) {
+    console.log('MyIdeation', id);
   }
 }

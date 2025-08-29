@@ -3,6 +3,7 @@ import { ServicesProvider } from './services-provider';
 import { GetServiceFilterQueryDto } from '../dtos/GetServicePaginationQueryDto';
 import { CreateServiceDto } from '../dtos/CreateServiceDto';
 import { CreateServiceProviderDto } from '../dtos/CreateServiceProviderDto';
+import { UpdateServiceDto } from '../dtos/UpdateServiceDto';
 
 @Injectable()
 export class ServicesService {
@@ -28,5 +29,7 @@ export class ServicesService {
     return this._serviceProvider.createServiceProvider(dto);
   }
 
-  async updateService() {}
+  async updateProvidedService(dto: UpdateServiceDto, id: number) {
+    return this._serviceProvider.updateProvidedService(dto, id);
+  }
 }
