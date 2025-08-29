@@ -1,9 +1,5 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
-import {
-  ApiProperty,
-  ApiPropertyOptional,
-  IntersectionType,
-} from '@nestjs/swagger';
+import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger';
 import { PaginationQueryDto } from '../../common/interceptors/pagination/dtos/pagination-query.dto';
 
 class GetServicePaginationQueryDto {
@@ -22,7 +18,7 @@ class GetServicePaginationQueryDto {
   })
   search?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Rating number of service',
   })
   @IsOptional()
