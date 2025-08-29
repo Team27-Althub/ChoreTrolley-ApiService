@@ -4,7 +4,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationQueryDto } from '../common/interceptors/pagination/dtos/pagination-query.dto';
 
 @Controller('dashboard')
-@ApiTags('dashboard')
+@ApiTags('Dashboard Module')
 export class DashboardController {
   constructor(private readonly _dashboardService: DashboardService) {}
 
