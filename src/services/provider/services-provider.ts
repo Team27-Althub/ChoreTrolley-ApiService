@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -134,5 +135,23 @@ export class ServicesProvider {
     );
 
     return await this._serviceProviderRepository.save(updatedProvider);
+  }
+
+  async deleteProvidedService(userId: number, serviceId: number) {
+    const existingService = await this._serviceRepository.findOne({
+      where: {
+        id: serviceId,
+      },
+      relations: ['provider'],
+    });
+    if (!existingService) {
+      throw new NotFoundException('Service not found');
+    }
+    if (existingService.serviceProvider.id !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this service',
+      );
+    }
+    await this._serviceRepository.remove(existingService);
   }
 }
