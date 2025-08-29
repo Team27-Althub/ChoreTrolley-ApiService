@@ -44,6 +44,9 @@ export class ServiceProvider {
   @Column({ type: 'float', default: 0 })
   rating: number;
 
+  @Column({ type: 'int', default: 0 })
+  id: number;
+
   // Relations
   @OneToMany(() => Service, (service) => service.serviceProvider)
   services: Service[];
