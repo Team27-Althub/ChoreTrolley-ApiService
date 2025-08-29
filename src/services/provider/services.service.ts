@@ -37,4 +37,8 @@ export class ServicesService {
   async updateServiceProvider(dto: UpdateServiceProviderDto, id: number) {
     return this._serviceProvider.updateServiceProvider(dto, id);
   }
+
+  async deleteProvidedService(userId: number, serviceId: number) {
+    return this._serviceProvider.deleteProvidedService(userId, serviceId);
+  }
 }
