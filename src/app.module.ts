@@ -98,4 +98,20 @@ const ENV = process.env.NODE_ENV;
     AccessTokenGuard,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly configService: ConfigService) {
+    console.log(
+      '✅ DatabaseHost:',
+      this.configService.get<string>('database.host'),
+    );
+    console.log(
+      '✅ DatabaseName:',
+      this.configService.get<string>('database.name'),
+    );
+    console.log('✅ EnvValue:', process.env.NODE_ENV);
+    console.log(
+      '✅ LoadingEnvFile:',
+      !process.env.NODE_ENV ? '.env' : `.env.${process.env.NODE_ENV}`,
+    );
+  }
+}
