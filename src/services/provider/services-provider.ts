@@ -17,6 +17,7 @@ import { CreateServiceDto } from '../dtos/CreateServiceDto';
 import { CreateServiceProviderDto } from '../dtos/CreateServiceProviderDto';
 import { ServiceProvider } from '../entities/service-provider.entity';
 import { UpdateServiceDto } from '../dtos/UpdateServiceDto';
+import { UpdateServiceProviderDto } from '../dtos/UpdateServiceProviderDto';
 
 @Injectable()
 export class ServicesProvider {
@@ -119,9 +120,19 @@ export class ServicesProvider {
     return this._serviceProviderRepository.save(serviceProvider);
   }
 
-  async updateServiceProvider() {
-    // const existingProvider = await this._serviceRepository.findOneBy({
-    //   id: dto.id,
-    // });
+  async updateServiceProvider(dto: UpdateServiceProviderDto, id: number) {
+    const existingProvider = await this._serviceProviderRepository.findOneBy({
+      id: id,
+    });
+    if (!existingProvider) {
+      throw new BadRequestException('Service Provider not found');
+    }
+    // Merge new values into existing provider
+    const updatedProvider = this._serviceProviderRepository.merge(
+      existingProvider,
+      dto,
+    );
+
+    return await this._serviceProviderRepository.save(updatedProvider);
   }
 }

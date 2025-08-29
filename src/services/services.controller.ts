@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Query } from '@nestjs/common';
 import { ServicesService } from './provider/services.service';
 import { GetServiceFilterQueryDto } from './dtos/GetServicePaginationQueryDto';
 import { CreateServiceDto } from './dtos/CreateServiceDto';
@@ -13,6 +13,7 @@ import {
 import { SkipResponseWrapper } from '../common/decorators/skip-response.decorator';
 import { UpdateServiceDto } from './dtos/UpdateServiceDto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { UpdateServiceProviderDto } from './dtos/UpdateServiceProviderDto';
 
 @Controller('services')
 @ApiTags('Service Module')
@@ -47,15 +48,6 @@ export class ServicesController {
     return this._services.createService(createService);
   }
 
-  @Get('/:id')
-  @ApiOperation({ summary: 'Get single service by ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'Service ID' })
-  @ApiResponse({ status: 200, description: 'Service returned successfully' })
-  @ApiResponse({ status: 404, description: 'Service not found' })
-  async getSingleService(id: number) {
-    return this._services.getSingleService(id);
-  }
-
   @Post('/create-provider')
   @ApiOperation({ summary: 'Create a new service provider' })
   @ApiResponse({
@@ -66,7 +58,7 @@ export class ServicesController {
     return this._services.createServiceProvider(dto);
   }
 
-  @Put('/update/:id')
+  @Put('/update')
   @ApiOperation({ summary: 'Update existing service' })
   @ApiResponse({
     status: 200,
@@ -96,14 +88,48 @@ export class ServicesController {
     @CurrentUser('sub') id: number,
     @Body() dto: UpdateServiceDto,
   ) {
+    //todo:: remove id from url param
     return this._services.updateProvidedService(dto, id);
   }
 
-  @Get('/update-provider')
+  @Put('/update-provider')
+  @ApiOperation({ summary: 'Update existing service provider' })
+  @ApiResponse({
+    status: 200,
+    description: 'Service Provider successfully updated',
+  })
+  @ApiBody({
+    description: 'Update service provider request body',
+    type: UpdateServiceDto,
+    examples: {
+      example1: {
+        summary: 'Update service provider',
+        value: {
+          id: 2,
+          bio: 'Dell Computer Engineer',
+          skills: 'plumbing,electrical,cleaning',
+          certifications: 'ISO-9001,Certificate of Completion',
+          available_hours: {
+            monday: ['09:00-12:00', '14:00-18:00'],
+            tuesday: ['09:00-15:00'],
+          },
+        },
+      },
+    },
+  })
   async updateServiceProvider(
     @CurrentUser('sub') id: number,
-    @Body() dto: CreateServiceProviderDto,
+    @Body() dto: UpdateServiceProviderDto,
   ) {
-    console.log('MyIdeation', id);
+    return this._services.updateServiceProvider(dto, id);
+  }
+
+  @Get('/:id')
+  @ApiOperation({ summary: 'Get single service by ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Service ID' })
+  @ApiResponse({ status: 200, description: 'Service returned successfully' })
+  @ApiResponse({ status: 404, description: 'Service not found' })
+  async getSingleService(id: number) {
+    return this._services.getSingleService(id);
   }
 }
