@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { ServicesService } from './provider/services.service';
 import { GetServiceFilterQueryDto } from './dtos/GetServicePaginationQueryDto';
 import { CreateServiceDto } from './dtos/CreateServiceDto';
@@ -122,6 +131,20 @@ export class ServicesController {
     @Body() dto: UpdateServiceProviderDto,
   ) {
     return this._services.updateServiceProvider(dto, id);
+  }
+
+  @Delete('/delete/:id')
+  @ApiOperation({ summary: 'Delete existing service' })
+  @ApiResponse({
+    status: 200,
+    description: 'Service successfully deleted',
+  })
+  @ApiParam({ name: 'id', type: Number, description: 'Service ID' })
+  async deleteService(
+    @CurrentUser('sub') userId: number,
+    @Param('id') serviceId: number,
+  ) {
+    return this._services.deleteProvidedService(userId, serviceId);
   }
 
   @Get('/:id')
