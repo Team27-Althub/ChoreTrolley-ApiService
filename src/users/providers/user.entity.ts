@@ -40,7 +40,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: UserStatus,
-    default: UserStatus.UnVerified,
+    default: UserStatus.Verified,
   })
   status: UserStatus;
 
