@@ -3,10 +3,11 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateServiceDto {
   @IsNotEmpty()
@@ -62,13 +63,31 @@ export class CreateServiceDto {
   })
   categoryId: number;
 
-  @IsNotEmpty()
-  @IsNumber()
-  @ApiProperty({
-    description: 'Service provider id',
-    example: '2',
+  // @IsNotEmpty()
+  // @IsNumber()
+  // @ApiProperty({
+  //   description: 'Service provider id',
+  //   example: '2',
+  // })
+  // providerId: number;
+
+  /**
+   * Example:
+   * {
+   *   "monday": ["09:00-12:00", "14:00-18:00"],
+   *   "tuesday": ["10:00-15:00"]
+   * }
+   */
+  @IsOptional()
+  @IsObject()
+  @ApiPropertyOptional({
+    description: 'Available Hours',
+    example: {
+      monday: ['09:00-12:00', '14:00-18:00'],
+      tuesday: ['09:00-15:00'],
+    },
   })
-  providerId: number;
+  available_hours: Record<string, string[]>;
 
   @IsNotEmpty()
   @IsEnum(['full-time', 'part-time', 'on-demand'])
