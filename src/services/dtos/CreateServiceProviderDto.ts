@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
-  IsJSON,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -26,7 +26,7 @@ export class CreateServiceProviderDto {
 
   @ApiProperty({
     description: 'Skills',
-    example: 'plumbing,electrical,cleaning',
+    example: ['plumbing', 'electrical', 'cleaning'],
   })
   @IsArray()
   @IsOptional()
@@ -34,7 +34,7 @@ export class CreateServiceProviderDto {
 
   @ApiProperty({
     description: 'Certifications',
-    example: 'ISO-9001,Certificate of Completion',
+    example: ['ISO-9001', 'Certificate of Completion'],
   })
   @IsArray()
   @IsOptional()
@@ -53,7 +53,7 @@ export class CreateServiceProviderDto {
       '  ]\n' +
       '}',
   })
-  @IsJSON()
+  @IsObject()
   @IsOptional()
   available_hours?: Record<string, string[]>;
 }
