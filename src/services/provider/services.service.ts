@@ -22,16 +22,16 @@ export class ServicesService {
     return this._serviceProvider.getSingleService(id);
   }
 
-  async createService(createService: CreateServiceDto) {
-    return this._serviceProvider.createService(createService);
+  async createService(createService: CreateServiceDto, userId: number) {
+    return this._serviceProvider.createService(createService, userId);
   }
 
-  async createServiceProvider(dto: CreateServiceProviderDto) {
-    return this._serviceProvider.createServiceProvider(dto);
+  async createServiceProvider(dto: CreateServiceProviderDto, userId: number) {
+    return this._serviceProvider.createServiceProvider(dto, userId);
   }
 
-  async updateProvidedService(dto: UpdateServiceDto, id: number) {
-    return this._serviceProvider.updateProvidedService(dto, id);
+  async updateProvidedService(dto: UpdateServiceDto, userId: number) {
+    return this._serviceProvider.updateProvidedService(dto, userId);
   }
 
   async updateServiceProvider(dto: UpdateServiceProviderDto, id: number) {
