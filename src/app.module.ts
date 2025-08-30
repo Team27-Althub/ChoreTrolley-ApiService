@@ -32,6 +32,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { ServiceProvider } from './services/entities/service-provider.entity';
 import { PaginationModule } from './common/pagination/pagination.module';
 import { CoreModule } from './core/core.module';
+import { GroceriesModule } from './groceries/groceries.module';
+import { Grocery } from './groceries/entities/Grocery';
 
 const ENV = process.env.NODE_ENV;
 
@@ -52,7 +54,15 @@ const ENV = process.env.NODE_ENV;
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        entities: [User, Otp, Service, Category, Review, ServiceProvider],
+        entities: [
+          User,
+          Otp,
+          Service,
+          Category,
+          Review,
+          ServiceProvider,
+          Grocery,
+        ],
         port: +configService.get('database.port'),
         host: configService.get<string>('database.host'),
         database: configService.get<string>('database.name'),
@@ -81,6 +91,7 @@ const ENV = process.env.NODE_ENV;
     DashboardModule,
     PaginationModule,
     CoreModule,
+    GroceriesModule,
   ],
   controllers: [
     AppController,

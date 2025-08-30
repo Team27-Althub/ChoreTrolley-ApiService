@@ -57,8 +57,11 @@ export class ServicesProvider {
     );
   }
 
-  async createService(dto: CreateServiceDto) {
-    const service = this._serviceRepository.create(dto);
+  async createService(dto: CreateServiceDto, userId: number) {
+    const serviceProvider = await this._serviceProviderRepository.findOneBy({
+      id: userId,
+    });
+    const service = this._serviceRepository.create({ ...dto, serviceProvider });
     return await this._serviceRepository.save(service);
   }
 
@@ -71,14 +74,14 @@ export class ServicesProvider {
     }
   }
 
-  async updateProvidedService(dto: UpdateServiceDto, id: number) {
+  async updateProvidedService(dto: UpdateServiceDto, userId: number) {
     return await this._serviceRepository.manager.transaction(
       async (transactionalEntityManager) => {
         // 1. Validate related entities
         const provider = await transactionalEntityManager.findOne(
           ServiceProvider,
           {
-            where: { id: dto.providerId },
+            where: { id: userId },
           },
         );
 
@@ -96,7 +99,7 @@ export class ServicesProvider {
 
         // 2. Preload service (merge existing + dto)
         const service = await transactionalEntityManager.preload(Service, {
-          id: id,
+          id: userId,
           ...dto,
         });
 
@@ -110,9 +113,9 @@ export class ServicesProvider {
     );
   }
 
-  async createServiceProvider(dto: CreateServiceProviderDto) {
+  async createServiceProvider(dto: CreateServiceProviderDto, userId: number) {
     const existingProvider = await this._serviceProviderRepository.findOneBy({
-      id: dto.id,
+      id: userId,
     });
     if (existingProvider) {
       throw new BadRequestException('Already existing provider');
@@ -142,7 +145,7 @@ export class ServicesProvider {
       where: {
         id: serviceId,
       },
-      relations: ['provider'],
+      relations: ['serviceProvider'],
     });
     if (!existingService) {
       throw new NotFoundException('Service not found');
