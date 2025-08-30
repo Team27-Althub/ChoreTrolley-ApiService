@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Service } from '../../services/entities/service.entity';
+import { Grocery } from '../../groceries/entities/Grocery';
 
 @Entity()
 export class Review {
@@ -12,6 +13,17 @@ export class Review {
   @Column('text')
   comment: string;
 
-  @ManyToOne(() => Service, (service) => service.reviews)
+  //Review linked to Services
+  @ManyToOne(() => Service, (service) => service.reviews, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   service: Service;
+
+  //Review linked to Groceries
+  @ManyToOne(() => Grocery, (grocery) => grocery.reviews, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  grocery: Grocery;
 }
