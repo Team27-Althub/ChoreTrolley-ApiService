@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/providers/user.entity';
 import { Service } from './service.entity';
+import { Grocery } from '../../groceries/entities/Grocery';
 
 @Entity()
 export class ServiceProvider {
@@ -28,8 +29,6 @@ export class ServiceProvider {
   @Column('simple-array', { nullable: true })
   certifications: string[]; // e.g. ["ISO-9001", "NEBOSH"]
 
-  @Column('jsonb', { nullable: true })
-  available_hours: Record<string, string[]>;
   /**
    * Example:
    * {
@@ -37,6 +36,8 @@ export class ServiceProvider {
    *   "tuesday": ["10:00-15:00"]
    * }
    */
+  @Column('jsonb', { nullable: true })
+  available_hours: Record<string, string[]>;
 
   @Column({ default: false })
   is_verified: boolean;
@@ -44,10 +45,13 @@ export class ServiceProvider {
   @Column({ type: 'float', default: 0 })
   rating: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', unique: true })
   id: number;
 
   // Relations
   @OneToMany(() => Service, (service) => service.serviceProvider)
   services: Service[];
+
+  @OneToMany(() => Grocery, (grocery) => grocery.serviceProvider)
+  groceries: Grocery[];
 }

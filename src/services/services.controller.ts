@@ -53,8 +53,11 @@ export class ServicesController {
   @Post('/create')
   @ApiOperation({ summary: 'Create a new service' })
   @ApiResponse({ status: 201, description: 'Service created successfully' })
-  async createService(@Body() createService: CreateServiceDto) {
-    return this._services.createService(createService);
+  async createService(
+    @Body() createService: CreateServiceDto,
+    @CurrentUser('sub') userId: number,
+  ) {
+    return this._services.createService(createService, userId);
   }
 
   @Post('/create-provider')
@@ -63,8 +66,11 @@ export class ServicesController {
     status: 201,
     description: 'Service provider created successfully',
   })
-  async createServiceProvider(@Body() dto: CreateServiceProviderDto) {
-    return this._services.createServiceProvider(dto);
+  async createServiceProvider(
+    @Body() dto: CreateServiceProviderDto,
+    @CurrentUser('sub') userId: number,
+  ) {
+    return this._services.createServiceProvider(dto, userId);
   }
 
   @Put('/update')
@@ -94,11 +100,10 @@ export class ServicesController {
     },
   })
   async updateService(
-    @CurrentUser('sub') id: number,
+    @CurrentUser('sub') userId: number,
     @Body() dto: UpdateServiceDto,
   ) {
-    //todo:: remove id from url param
-    return this._services.updateProvidedService(dto, id);
+    return this._services.updateProvidedService(dto, userId);
   }
 
   @Put('/update-provider')
@@ -116,8 +121,8 @@ export class ServicesController {
         value: {
           id: 2,
           bio: 'Dell Computer Engineer',
-          skills: 'plumbing,electrical,cleaning',
-          certifications: 'ISO-9001,Certificate of Completion',
+          skills: ['plumbing', 'electrical', 'cleaning'],
+          certifications: ['ISO-9001', 'Certificate of Completion'],
           available_hours: {
             monday: ['09:00-12:00', '14:00-18:00'],
             tuesday: ['09:00-15:00'],
@@ -152,7 +157,7 @@ export class ServicesController {
   @ApiParam({ name: 'id', type: Number, description: 'Service ID' })
   @ApiResponse({ status: 200, description: 'Service returned successfully' })
   @ApiResponse({ status: 404, description: 'Service not found' })
-  async getSingleService(id: number) {
+  async getSingleService(@Param('id') id: number) {
     return this._services.getSingleService(id);
   }
 }
