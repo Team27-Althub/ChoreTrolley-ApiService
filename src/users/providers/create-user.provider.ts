@@ -14,7 +14,6 @@ import { MailService } from '../../mail/providers/mail.service';
 import { OtpService } from '../../otp/otp.service';
 import { OtpType } from '../../otp/types/OtpType';
 import { UserStatus } from '../enums/user-status';
-import * as console from 'node:console';
 
 @Injectable()
 export class CreateUserProvider {
@@ -52,8 +51,6 @@ export class CreateUserProvider {
         where: { email: createUserDto.email },
       });
     } catch (error) {
-      //log error to the console
-      console.error('CreateUserException:', error);
       throw new RequestTimeoutException(
         'Unable to process your request. try later',
         {
