@@ -12,11 +12,13 @@ import { GenerateTokensProvider } from './providers/generate-tokens.provider';
 import { RefreshTokenProvider } from './providers/refresh-token.provider';
 import { GoogleAuthenticationController } from './social/google-authentication.controller';
 import { GoogleAuthenticationService } from './social/providers/google-authentication.service';
+import { RedisService } from '../redis/redis.service';
 
 @Module({
   controllers: [AuthController, GoogleAuthenticationController],
   providers: [
     AuthService,
+    RedisService,
     {
       provide: HashingProvider,
       useClass: BcryptProvider,

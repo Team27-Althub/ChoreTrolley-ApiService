@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { UserStatus } from '../enums/user-status';
+import { Profile } from '../../profile/entities/profile.entity';
 
 @Entity('users')
 export class User {
@@ -50,4 +51,7 @@ export class User {
   })
   @Exclude()
   googleId?: string;
+
+  @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
+  profile: Profile;
 }
