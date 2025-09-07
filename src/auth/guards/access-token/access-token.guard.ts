@@ -10,6 +10,7 @@ import { ConfigType } from '@nestjs/config';
 import JwtConfig from '../../config/jwtConfig';
 import jwtConfig from '../../config/jwtConfig';
 import { Request } from 'express';
+import { AuthService } from '../../providers/auth.service';
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
@@ -23,6 +24,7 @@ export class AccessTokenGuard implements CanActivate {
      */
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof JwtConfig>,
+    private readonly _authService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -34,6 +36,12 @@ export class AccessTokenGuard implements CanActivate {
 
     //Validate the token
     if (!token) throw new UnauthorizedException();
+
+    const tokenNullified = await this._authService.isTokenNullified(token);
+
+    if (tokenNullified) {
+      throw new UnauthorizedException('Token has been revoked');
+    }
 
     try {
       request.user = await this.jwtService.verifyAsync(
