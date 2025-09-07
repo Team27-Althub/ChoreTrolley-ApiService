@@ -21,6 +21,7 @@ import { OtpType } from '../../otp/types/OtpType';
 import { OtpService } from '../../otp/otp.service';
 import { UserStatus } from '../../users/enums/user-status';
 import { MailService } from '../../mail/providers/mail.service';
+import { UpdatePasswordDto } from '../dtos/UpdatePasswordDto';
 
 @Injectable()
 export class SignInProvider {
@@ -74,7 +75,7 @@ export class SignInProvider {
       throw new UnauthorizedException('Invalid password');
     }
 
-    //Check if account is UserStatus.UnVerified
+    //Check if an account is UserStatus.UnVerified
     if (user.status === UserStatus.UnVerified) {
       throw new UnauthorizedException(`Account is ${user.status}`);
     }
@@ -116,4 +117,42 @@ export class SignInProvider {
     userExist.password = await this._hashingProvider.hashPassword(newPassword);
     return await this._usersService.updateUserAccount(userExist);
   }
+
+  async updatePassword(userId: number, dto: UpdatePasswordDto) {
+    const userExist = await this._usersService.findUserByUserId(userId);
+    if (!userExist) {
+      throw new NotFoundException('User not found');
+    }
+    const foundMatchPassword = await this._hashingProvider.comparePassword(
+      dto.oldPassword,
+      userExist.password,
+    );
+
+    if (!foundMatchPassword) {
+      throw new BadRequestException('Invalid old password');
+    }
+    userExist.password = await this._hashingProvider.hashPassword(
+      dto.newPassword,
+    );
+    return await this._usersService.updateUserAccount(userExist);
+  }
+
+  async getAccessTokenObject(token: string): Promise<JwtPayload> {
+    try {
+      return await this.jwtService.verifyAsync<JwtPayload>(token, {
+        secret: this.jwtConfiguration.secret,
+        audience: this.jwtConfiguration.audience,
+        issuer: this.jwtConfiguration.issuer,
+      });
+    } catch (e) {
+      throw new UnauthorizedException(e.message || 'Invalid token');
+    }
+  }
+}
+
+export interface JwtPayload {
+  sub: string;
+  email: string;
+  iat?: number;
+  exp?: number;
 }
