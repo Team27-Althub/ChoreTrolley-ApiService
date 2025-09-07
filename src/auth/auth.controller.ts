@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
   HttpCode,
   HttpStatus,
   Inject,
+  Patch,
   Post,
+  Req,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
@@ -27,6 +30,8 @@ import { RequestTokenDto } from '../users/dtos/request-token.dto';
 import jwtConfig from './config/jwtConfig';
 import { ConfigType } from '@nestjs/config';
 import JwtConfig from './config/jwtConfig';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { UpdatePasswordDto } from './dtos/UpdatePasswordDto';
 
 @Controller('auth')
 @Auth(AuthType.None)
@@ -100,5 +105,26 @@ export class AuthController {
     { token, password }: { token: string; password: string },
   ) {
     return this._authService.resetPassword(token, password);
+  }
+
+  @Patch('update-password')
+  @ApiOperation({ summary: 'Use endpoint to update password' })
+  async updatePassword(
+    @CurrentUser('sub') userId: number,
+    @Body() dto: UpdatePasswordDto,
+  ) {
+    return this._authService.updatePassword(userId, dto);
+  }
+
+  @Post('logout')
+  @ApiOperation({ summary: 'Logout user from the application' })
+  async logout(@Req() req: Request) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader?.split(' ')[1];
+    if (!token) {
+      throw new BadRequestException('Access Invalidated! ');
+    }
+
+    return await this._authService.authLogOut(token);
   }
 }

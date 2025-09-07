@@ -34,8 +34,13 @@ import { PaginationModule } from './common/pagination/pagination.module';
 import { CoreModule } from './core/core.module';
 import { GroceriesModule } from './groceries/groceries.module';
 import { Grocery } from './groceries/entities/Grocery';
+import { ProfileModule } from './profile/profile.module';
+import { RedisModule } from './redis/redis.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-ioredis-yet';
+import { Profile } from './profile/entities/profile.entity';
 
-const ENV = process.env.NODE_ENV;
+const ENV = process.env.NODE_ENV || 'development';
 
 @Module({
   imports: [
@@ -48,6 +53,16 @@ const ENV = process.env.NODE_ENV;
       envFilePath: !ENV ? '.env' : `.env.${ENV}`,
       load: [appConfig, databaseConfig],
       validationSchema: environmentValidation,
+    }),
+    CacheModule.registerAsync({
+      useFactory: async () => ({
+        store: await redisStore({
+          host: 'localhost',
+          port: 6379,
+          ttl: 60, // default time-to-live in seconds
+        }),
+      }),
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -62,6 +77,7 @@ const ENV = process.env.NODE_ENV;
           Review,
           ServiceProvider,
           Grocery,
+          Profile,
         ],
         port: +configService.get('database.port'),
         host: configService.get<string>('database.host'),
@@ -92,6 +108,8 @@ const ENV = process.env.NODE_ENV;
     PaginationModule,
     CoreModule,
     GroceriesModule,
+    ProfileModule,
+    RedisModule,
   ],
   controllers: [
     AppController,
