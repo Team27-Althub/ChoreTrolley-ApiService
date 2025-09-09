@@ -40,7 +40,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-ioredis-yet';
 import { Profile } from './profile/entities/profile.entity';
 
-const ENV = process.env.NODE_ENV || 'development';
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
@@ -57,9 +57,10 @@ const ENV = process.env.NODE_ENV || 'development';
     CacheModule.registerAsync({
       useFactory: async () => ({
         store: await redisStore({
-          host: 'localhost',
-          port: 6379,
-          ttl: 60, // default time-to-live in seconds
+          url: process.env.REDIS_URL,
+          // host: 'localhost',
+          // port: 6379,
+          // ttl: 60, // default time-to-live in seconds
         }),
       }),
       isGlobal: true,
