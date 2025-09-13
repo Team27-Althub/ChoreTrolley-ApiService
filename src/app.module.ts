@@ -56,12 +56,8 @@ const ENV = process.env.NODE_ENV;
     }),
     CacheModule.registerAsync({
       useFactory: async () => ({
-        store: await redisStore({
-          url: process.env.REDIS_URL,
-          // host: 'localhost',
-          // port: 6379,
-          // ttl: 60, // default time-to-live in seconds
-        }),
+        store: redisStore,
+        url: process.env.REDIS_URL,
       }),
       isGlobal: true,
     }),
