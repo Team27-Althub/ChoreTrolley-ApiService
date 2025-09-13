@@ -41,7 +41,7 @@ import { redisStore } from 'cache-manager-ioredis-yet';
 import { Profile } from './profile/entities/profile.entity';
 
 const ENV = process.env.NODE_ENV;
-
+const redisUrl = new URL(process.env.REDIS_URL!);
 @Module({
   imports: [
     CoreModule,
@@ -57,7 +57,11 @@ const ENV = process.env.NODE_ENV;
     CacheModule.registerAsync({
       useFactory: async () => ({
         store: redisStore,
-        url: process.env.REDIS_URL,
+        // url: process.env.REDIS_URL,
+        host: redisUrl.hostname,
+        port: Number(redisUrl.port),
+        password: redisUrl.password,
+        ttl: 60,
       }),
       isGlobal: true,
     }),
