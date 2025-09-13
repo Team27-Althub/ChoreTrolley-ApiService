@@ -10,7 +10,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   onModuleInit() {
-    this._redis = new Redis({ host: 'localhost', port: 6379 });
+    this._redis = new Redis(process.env.REDIS_URL!);
   }
 
   async set(key: string, value: string, ttl?: number) {
