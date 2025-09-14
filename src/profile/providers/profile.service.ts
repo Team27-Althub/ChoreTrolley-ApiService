@@ -11,9 +11,9 @@ export class ProfileService {
     return await this._profileProvider.getProfileById(userId);
   }
 
-  async createProfile(userId: number, dto: CreateProfileDto) {
+  async createOrUpdateProfile(userId: number, dto: CreateProfileDto) {
     Object.assign(dto, { userId });
-    return await this._profileProvider.createProfile(dto);
+    return await this._profileProvider.createOrUpdateProfile(dto);
   }
 
   async updateProfile(userId: number, dto: UpdateProfileDto) {
