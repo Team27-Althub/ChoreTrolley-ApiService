@@ -22,9 +22,22 @@ export class ProfileProvider {
     return this.findProfileByUserId(id);
   }
 
-  async createProfile(dto: CreateProfileDto): Promise<Profile> {
+  async createOrUpdateProfile(dto: CreateProfileDto): Promise<Profile> {
     const user = await this._userRepository.findOneBy({ id: dto.userId });
-    const profile = this._profileRepository.create({ ...dto, user });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // check if a profile exists
+    let profile = await this._profileRepository.findOne({
+      where: { user: { id: dto.userId } },
+    });
+
+    profile = profile
+      ? this._profileRepository.merge(profile, dto)
+      : this._profileRepository.create({ ...dto, user });
+
+    //const profile = this._profileRepository.create({ ...dto, user });
     return await this._profileRepository.save(profile);
   }
 
