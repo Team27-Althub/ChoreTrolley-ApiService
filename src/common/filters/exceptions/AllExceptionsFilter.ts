@@ -16,16 +16,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Something went wrong';
+    let devError: any = null;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
-      message = exception.message;
+      const res = exception.getResponse();
+      message = message = exception.message;
+      devError = res;
     }
 
     response.status(status).json({
       success: false,
       statusCode: status,
       message,
+      devError,
     });
   }
 }
