@@ -16,7 +16,10 @@ export class ProfileController {
     @CurrentUser('sub') userId: number,
     @Body() createProfileDto: CreateProfileDto,
   ): Promise<Profile> {
-    return await this.profileService.createProfile(userId, createProfileDto);
+    return await this.profileService.createOrUpdateProfile(
+      userId,
+      createProfileDto,
+    );
   }
 
   @Get()
