@@ -39,9 +39,11 @@ import { RedisModule } from './redis/redis.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-ioredis-yet';
 import { Profile } from './profile/entities/profile.entity';
+import { OrderModule } from './order/order.module';
+import { Order } from './order/entities/order.entity';
 
 const ENV = process.env.NODE_ENV;
-const redisUrl = new URL(process.env.REDIS_URL!);
+
 @Module({
   imports: [
     CoreModule,
@@ -55,14 +57,17 @@ const redisUrl = new URL(process.env.REDIS_URL!);
       validationSchema: environmentValidation,
     }),
     CacheModule.registerAsync({
-      useFactory: async () => ({
-        store: redisStore,
-        // url: process.env.REDIS_URL,
-        host: redisUrl.hostname,
-        port: Number(redisUrl.port),
-        password: redisUrl.password,
-        ttl: 60,
-      }),
+      useFactory: async () => {
+        const redisUrl = new URL(process.env.REDIS_URL!);
+        return {
+          store: redisStore,
+          // url: process.env.REDIS_URL,
+          host: redisUrl.hostname,
+          port: Number(redisUrl.port),
+          password: redisUrl.password,
+          ttl: 60,
+        };
+      },
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
@@ -79,6 +84,7 @@ const redisUrl = new URL(process.env.REDIS_URL!);
           ServiceProvider,
           Grocery,
           Profile,
+          Order,
         ],
         port: +configService.get('database.port'),
         host: configService.get<string>('database.host'),
@@ -111,6 +117,8 @@ const redisUrl = new URL(process.env.REDIS_URL!);
     GroceriesModule,
     ProfileModule,
     RedisModule,
+    // StorageModule,
+    OrderModule,
   ],
   controllers: [
     AppController,
