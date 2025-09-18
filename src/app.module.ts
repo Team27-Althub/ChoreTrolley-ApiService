@@ -42,7 +42,7 @@ import { Profile } from './profile/entities/profile.entity';
 import { OrderModule } from './order/order.module';
 import { Order } from './order/entities/order.entity';
 
-const ENV = process.env.NODE_ENV || 'development';
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
