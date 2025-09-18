@@ -9,8 +9,12 @@ import { DatabaseInterceptor } from '../common/interceptors/database/DatabaseInt
 import { AllExceptionsFilter } from '../common/filters/exceptions/AllExceptionsFilter';
 import { DataResponseInterceptor } from '../common/interceptors/data-reponse/data-response.interceptor';
 import { ConfigService } from '@nestjs/config';
+import { StorageModule } from '../storage/storage.module';
 
 @Module({
+  // imports: [
+  //   StorageModule.register(process.env.STORAGE_PROVIDER as any), // e.g. "gcs"
+  // ],
   providers: [
     // ✅ Global Validation Pipe
     {
