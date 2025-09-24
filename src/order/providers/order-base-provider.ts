@@ -7,6 +7,7 @@ import { Service } from '../../services/entities/service.entity';
 import { Order } from '../entities/order.entity';
 import { Injectable } from '@nestjs/common';
 import { PaginationProvider } from '../../common/pagination/providers/pagination.provider';
+import { OrderSequence } from '../entities/order-sequence.entity';
 
 export abstract class BaseService<T> {
   protected readonly repository: Repository<T>;
@@ -34,21 +35,17 @@ export abstract class OrderBaseProvider extends BaseService<Order> {
   constructor(
     @InjectRepository(User)
     readonly _userRepository: Repository<User>,
-
     @InjectRepository(Address)
     protected readonly _addressRepository: Repository<Address>,
-
     @InjectRepository(Grocery)
     protected readonly _groceryRepository: Repository<Grocery>,
-
     @InjectRepository(Service)
     protected readonly _serviceRepository: Repository<Service>,
-
     @InjectRepository(Order)
     protected readonly _orderRepository: Repository<Order>,
-
+    @InjectRepository(OrderSequence)
+    protected readonly _orderSequenceRepository: Repository<OrderSequence>,
     protected readonly _paginationProvider: PaginationProvider,
-
     protected readonly _dataSource: DataSource,
   ) {
     super(_dataSource, Order);
