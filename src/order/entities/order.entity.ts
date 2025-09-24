@@ -42,6 +42,9 @@ export class Order {
   @ManyToOne(() => User, (user) => user.orders, { lazy: true })
   user: User;
 
+  @Column({ unique: true, nullable: true })
+  code: string;
+
   @ManyToOne(() => Address, { eager: true })
   deliveryAddress: Address;
 

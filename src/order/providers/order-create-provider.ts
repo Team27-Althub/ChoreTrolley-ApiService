@@ -4,6 +4,7 @@ import { Grocery } from '../../groceries/entities/Grocery';
 import { Service } from '../../services/entities/service.entity';
 import { CreateOrderDto } from '../dtos/CreateOrderDto';
 import { OrderBaseProvider } from './order-base-provider';
+import { OrderSequence } from '../entities/order-sequence.entity';
 
 @Injectable()
 export class OrderCreateProvider extends OrderBaseProvider {
@@ -32,6 +33,9 @@ export class OrderCreateProvider extends OrderBaseProvider {
       });
     }
 
+    const prefix = groceries.length ? 'CTGx' : 'CTSx';
+    const code = await this.createOrderDataByCode(prefix);
+
     const orderRequest = this._orderRepository.create({
       user,
       services: services,
@@ -43,8 +47,28 @@ export class OrderCreateProvider extends OrderBaseProvider {
       shipping: dto.shipping,
       total: dto.total,
       tax: dto.tax,
+      code: code,
     });
 
     return this._orderRepository.save(orderRequest);
+  }
+
+  private async createOrderDataByCode(prefix: string): Promise<string> {
+    const now = new Date();
+    const period = now.toISOString().slice(0, 7);
+
+    return await this.transaction(async (manager) => {
+      let seq = await manager.findOne(OrderSequence, {
+        where: { prefix, period },
+      });
+
+      if (!seq) {
+        seq = manager.create(OrderSequence, { prefix, period, lastNumber: 0 });
+      }
+      seq.lastNumber += 1;
+      await manager.save(seq);
+      const datePart = now.toISOString().slice(0, 7).replace(/-/g, '');
+      return `${prefix}${datePart}${seq.lastNumber.toString().padStart(4, '0')}`;
+    });
   }
 }
