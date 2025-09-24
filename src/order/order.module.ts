@@ -11,6 +11,7 @@ import { Grocery } from '../groceries/entities/Grocery';
 import { Service } from '../services/entities/service.entity';
 import { PaginationModule } from '../common/pagination/pagination.module';
 import { OrderGetListProvider } from './providers/order-getlist-provider';
+import { OrderSequence } from './entities/order-sequence.entity';
 
 @Module({
   controllers: [OrderController],
@@ -21,7 +22,14 @@ import { OrderGetListProvider } from './providers/order-getlist-provider';
     OrderGetListProvider,
   ],
   imports: [
-    TypeOrmModule.forFeature([User, Order, Address, Grocery, Service]),
+    TypeOrmModule.forFeature([
+      User,
+      Order,
+      Address,
+      Grocery,
+      Service,
+      OrderSequence,
+    ]),
     PaginationModule,
   ],
 })
