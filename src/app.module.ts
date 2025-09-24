@@ -41,6 +41,7 @@ import { redisStore } from 'cache-manager-ioredis-yet';
 import { Profile } from './profile/entities/profile.entity';
 import { OrderModule } from './order/order.module';
 import { Order } from './order/entities/order.entity';
+import { OrderSequence } from './order/entities/order-sequence.entity';
 
 const ENV = process.env.NODE_ENV;
 
@@ -85,6 +86,7 @@ const ENV = process.env.NODE_ENV;
           Grocery,
           Profile,
           Order,
+          OrderSequence,
         ],
         port: +configService.get('database.port'),
         host: configService.get<string>('database.host'),
