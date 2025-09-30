@@ -6,8 +6,10 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  IsUrl,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class CreateServiceDto {
   @IsNotEmpty()
@@ -33,6 +35,7 @@ export class CreateServiceDto {
 
   @IsNotEmpty()
   @IsNumber()
+  @Type(() => Number)
   @ApiProperty({
     description: 'Amount of the service',
     example: '15000',
@@ -49,6 +52,7 @@ export class CreateServiceDto {
 
   @IsOptional()
   @IsBoolean()
+  @Type(() => Boolean)
   @ApiProperty({
     description: 'Indicates if the service is sponsored',
     example: 'true or false',
@@ -57,6 +61,7 @@ export class CreateServiceDto {
 
   @IsNotEmpty()
   @IsNumber()
+  @Type(() => Number)
   @ApiProperty({
     description: 'Category Id',
     example: 'e.g 1',
