@@ -36,6 +36,16 @@ export class OrderCreateProvider extends OrderBaseProvider {
     const prefix = groceries.length ? 'CTGx' : 'CTSx';
     const code = await this.createOrderDataByCode(prefix);
 
+    /**
+     * Initialize paystack
+     */
+    const callbackUrl = `${process.env.APP_URL}/payments/verify`;
+    const init = await this.paystackService.initPayment(
+      user.email,
+      dto.total,
+      callbackUrl,
+    );
+
     const orderRequest = this._orderRepository.create({
       user,
       services: services,
@@ -48,9 +58,10 @@ export class OrderCreateProvider extends OrderBaseProvider {
       total: dto.total,
       tax: dto.tax,
       code: code,
+      reference: init.data.reference,
     });
-
-    return this._orderRepository.save(orderRequest);
+    await this._orderRepository.save(orderRequest);
+    return { order: orderRequest, paymentUrl: init.data.authorization_url };
   }
 
   private async createOrderDataByCode(prefix: string): Promise<string> {
