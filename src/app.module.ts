@@ -46,7 +46,7 @@ import { StorageModule } from './storage/storage.module';
 import { StorageMiddleware } from './common/middleware/storage-middleware';
 import * as process from 'node:process';
 
-const ENV = process.env.NODE_ENV || 'development';
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
