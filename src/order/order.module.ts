@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { OrderController } from './order.controller';
 import { OrderCreateProvider } from './providers/order-create-provider';
 import { OrderService } from './providers/order.service';
@@ -12,6 +12,8 @@ import { Service } from '../services/entities/service.entity';
 import { PaginationModule } from '../common/pagination/pagination.module';
 import { OrderGetListProvider } from './providers/order-getlist-provider';
 import { OrderSequence } from './entities/order-sequence.entity';
+import { PaystackModule } from '../paystack/paystack.module';
+import { OrderStatusProvider } from './providers/order-status.provider';
 
 @Module({
   controllers: [OrderController],
@@ -20,6 +22,7 @@ import { OrderSequence } from './entities/order-sequence.entity';
     OrderService,
     OrderCancelProvider,
     OrderGetListProvider,
+    OrderStatusProvider,
   ],
   imports: [
     TypeOrmModule.forFeature([
@@ -30,6 +33,7 @@ import { OrderSequence } from './entities/order-sequence.entity';
       Service,
       OrderSequence,
     ]),
+    forwardRef(() => PaystackModule),
     PaginationModule,
   ],
 })
