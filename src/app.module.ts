@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -42,6 +42,9 @@ import { Profile } from './profile/entities/profile.entity';
 import { OrderModule } from './order/order.module';
 import { Order } from './order/entities/order.entity';
 import { OrderSequence } from './order/entities/order-sequence.entity';
+import { StorageModule } from './storage/storage.module';
+import { StorageMiddleware } from './common/middleware/storage-middleware';
+import * as process from 'node:process';
 
 const ENV = process.env.NODE_ENV;
 
@@ -57,6 +60,7 @@ const ENV = process.env.NODE_ENV;
       load: [appConfig, databaseConfig],
       validationSchema: environmentValidation,
     }),
+    StorageModule.register(process.env.STORAGE_PROVIDER as any),
     CacheModule.registerAsync({
       useFactory: async () => {
         const redisUrl = new URL(process.env.REDIS_URL!);
@@ -138,7 +142,7 @@ const ENV = process.env.NODE_ENV;
     AccessTokenGuard,
   ],
 })
-export class AppModule {
+export class AppModule implements NestModule {
   constructor(private readonly configService: ConfigService) {
     console.log(
       '✅ DatabaseHost:',
@@ -153,5 +157,9 @@ export class AppModule {
       '✅ LoadingEnvFile:',
       !process.env.NODE_ENV ? '.env' : `.env.${process.env.NODE_ENV}`,
     );
+  }
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(StorageMiddleware).forRoutes('*');
   }
 }
