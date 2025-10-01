@@ -47,7 +47,7 @@ import { StorageMiddleware } from './common/middleware/storage-middleware';
 import { PaystackModule } from './paystack/paystack.module';
 import * as process from 'node:process';
 
-const ENV = process.env.NODE_ENV || 'development';
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
