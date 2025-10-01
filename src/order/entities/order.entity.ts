@@ -1,11 +1,13 @@
 import { User } from 'src/users/providers/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Address } from './address.entity';
 import { Grocery } from '../../groceries/entities/Grocery';
@@ -18,7 +20,7 @@ export enum ShippingMethod {
 }
 
 export enum ContractType {
-  ONE_TIME = 'One Time',
+  ONE_TIME = 'One-Time',
   RECURRING = 'Recurring',
 }
 
@@ -32,6 +34,14 @@ export enum OrderStatus {
   CONFIRMED = 'Confirmed',
   DELIVERED = 'Delivered',
   CANCELED = 'Canceled',
+}
+
+export enum PaymentStatus {
+  PAID = 'paid',
+  FAILED = 'failed',
+  PENDING = 'pending',
+  REFUNDED = 'refunded',
+  EXPIRED = 'expired',
 }
 
 @Entity()
@@ -48,11 +58,11 @@ export class Order {
   @ManyToOne(() => Address, { eager: true })
   deliveryAddress: Address;
 
-  @ManyToMany(() => Grocery, { eager: true })
+  @ManyToMany(() => Grocery, { lazy: true })
   @JoinTable()
   groceries: Grocery[];
 
-  @ManyToMany(() => Service, { eager: true })
+  @ManyToMany(() => Service, { lazy: true })
   @JoinTable()
   services: Service[];
 
@@ -80,6 +90,20 @@ export class Order {
   @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING })
   status: OrderStatus;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ nullable: true })
+  reference: string;
+
+  @Column({
+    type: 'enum',
+    enum: PaymentStatus,
+    nullable: true,
+    default: PaymentStatus.PENDING,
+  })
+  paymentStatus: PaymentStatus;
+
+  @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpStatus, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Req,
+  Headers,
+} from '@nestjs/common';
 import { OrderService } from './providers/order.service';
 import { CreateOrderDto } from './dtos/CreateOrderDto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -6,6 +16,7 @@ import { OrderFilterQueryDto } from './dtos/OrderPaginationQuery';
 import { SkipResponseWrapper } from '../common/decorators/skip-response.decorator';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CancelOrderDto } from './providers/order-cancel-provider';
+import * as crypto from 'crypto';
 import {
   ContractType,
   PaymentMethod,
@@ -103,5 +114,37 @@ export class OrderController {
     return await this._orderService.cancel(dto, (result) => {
       console.log('OrderCanceled: ', result);
     });
+  }
+
+  @Post('webhook')
+  async webhook(
+    @Req() req: any,
+    @Headers('x-paystack-signature') signature: string,
+  ) {
+    const secret = process.env.PAYSTACK_SECRET_KEY;
+
+    // Verify signature with raw body
+    const hash = crypto
+      .createHmac('sha512', secret)
+      .update(req.rawBody)
+      .digest('hex');
+
+    if (hash !== signature) {
+      throw new HttpException('Invalid signature', HttpStatus.FORBIDDEN);
+    }
+
+    const event = req.body;
+
+    if (event.event === 'charge.success') {
+      const { reference } = event.data;
+      await this._orderService.markAsPaid(reference);
+    }
+
+    if (event.event === 'charge.failed') {
+      const { reference } = event.data;
+      await this._orderService.markAsFailed(reference);
+    }
+
+    return { status: HttpStatus.OK, message: 'Webhook received' };
   }
 }
