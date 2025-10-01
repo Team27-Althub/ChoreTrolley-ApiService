@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ServicesService } from './provider/services.service';
 import { GetServiceFilterQueryDto } from './dtos/GetServicePaginationQueryDto';
@@ -23,6 +24,8 @@ import { SkipResponseWrapper } from '../common/decorators/skip-response.decorato
 import { UpdateServiceDto } from './dtos/UpdateServiceDto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UpdateServiceProviderDto } from './dtos/UpdateServiceProviderDto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadedFileToDto } from '../common/decorators/uploaded-file-to-dto';
 
 @Controller('services')
 @ApiTags('Service Module')
@@ -51,13 +54,15 @@ export class ServicesController {
   }
 
   @Post('/create')
+  @UseInterceptors(FileInterceptor('imageUrl'))
   @ApiOperation({ summary: 'Create a new service' })
   @ApiResponse({ status: 201, description: 'Service created successfully' })
   async createService(
-    @Body() createService: CreateServiceDto,
+    @UploadedFileToDto({ field: 'imageUrl', dto: CreateServiceDto })
+    dto: CreateServiceDto,
     @CurrentUser('sub') userId: number,
   ) {
-    return this._services.createService(createService, userId);
+    return this._services.createService(dto, userId);
   }
 
   @Post('/create-provider')
