@@ -53,4 +53,13 @@ export class GenerateTokensProvider {
 
     return { accessToken, refreshToken };
   }
+
+  async tokenVerification(token: string) {
+    const payload = await this.jwtService.verifyAsync(token, {
+      secret: this.jwtConfiguration.secret,
+      audience: this.jwtConfiguration.audience,
+      issuer: this.jwtConfiguration.issuer,
+    });
+    return payload;
+  }
 }

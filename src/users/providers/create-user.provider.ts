@@ -14,6 +14,7 @@ import { MailService } from '../../mail/providers/mail.service';
 import { OtpService } from '../../otp/otp.service';
 import { OtpType } from '../../otp/types/OtpType';
 import { UserStatus } from '../enums/user-status';
+import { GenerateTokensProvider } from '../../auth/providers/generate-tokens.provider';
 
 @Injectable()
 export class CreateUserProvider {
@@ -28,6 +29,7 @@ export class CreateUserProvider {
      */
     @Inject(forwardRef(() => HashingProvider))
     private readonly _hashingProvider: HashingProvider,
+    private readonly _tokenProvider: GenerateTokensProvider,
     /**
      * Mail service injection
      */
@@ -85,17 +87,34 @@ export class CreateUserProvider {
     }
 
     //create otp
-    const otp = await this._otpService.generateToken(newUser, OtpType.OTP);
+    const token = await this._tokenProvider.generateTokens(newUser);
+    const urlActivate = `${process.env.FRONTEND_URL}?token=${token.accessToken}`;
 
     //test email notification using mailTrap test account
     //do not throw error on production should mailTrap fails
     try {
-      await this._mailService.sendUserWelcome(newUser, otp);
+      await this._mailService.sendUserWelcome(newUser, '', urlActivate);
     } catch (e) {
       throw new RequestTimeoutException(e);
     }
 
     return newUser;
+  }
+
+  async tokenVerification(token: string) {
+    const user = await this._tokenProvider.tokenVerification(token);
+    console.log('PromiseUserProvider', user);
+    const userFound = await this._usersRepository.findOne({
+      where: {
+        id: user.sub,
+        email: user.email,
+      },
+    });
+    if (!userFound) {
+      throw new BadRequestException('User not found');
+    }
+    userFound.status = UserStatus.Verified;
+    return await this._usersRepository.save(userFound);
   }
 
   async verifyActiveToken(userId: number, token: string) {
