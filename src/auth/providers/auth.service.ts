@@ -13,6 +13,7 @@ import { RefreshTokenProvider } from './refresh-token.provider';
 import { RequestTokenDto } from '../../users/dtos/request-token.dto';
 import { UpdatePasswordDto } from '../dtos/UpdatePasswordDto';
 import { RedisService } from '../../redis/redis.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +31,7 @@ export class AuthService {
      * Refresh token provider
      */
     private readonly _refreshTokenProvider: RefreshTokenProvider,
+    private readonly jwtService: JwtService,
     /**
      * Inject Redis
      */
@@ -73,5 +75,11 @@ export class AuthService {
 
   async isTokenNullified(token: string): Promise<boolean> {
     return (await this._redisService.get(`bl_${token}`)) === '1';
+  }
+
+  async activateAccount(token: string) {
+    const payload = await this._signInProvider.getAccessTokenObject(token);
+    console.log('ActiveAccountPayload::->', payload);
+    return this._userService.verifyActiveTokenProvided(+payload.sub, token);
   }
 }
