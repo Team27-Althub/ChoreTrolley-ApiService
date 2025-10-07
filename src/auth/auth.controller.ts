@@ -3,11 +3,13 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Inject,
   Patch,
   Post,
+  Query,
   Req,
   UseInterceptors,
   ValidationPipe,
@@ -126,5 +128,19 @@ export class AuthController {
     }
 
     return await this._authService.authLogOut(token);
+  }
+
+  @Get('activate')
+  @Auth(AuthType.None)
+  @ApiOperation({ summary: 'Activate user account' })
+  @ApiOkResponse({
+    description: 'User account successfully activated',
+  })
+  @ApiBadRequestResponse({
+    description: 'Bad payload sent',
+  })
+  @UseInterceptors(ClassSerializerInterceptor)
+  async activateUserAccount(@Query('token') token: string) {
+    return await this._authService.activateAccount(token);
   }
 }

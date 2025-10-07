@@ -79,8 +79,8 @@ export class UsersService {
     return await this._createGoogleUserProvider.createGoogleUser(googleUser);
   }
 
-  async verifyActiveOtp(userId: number, token: string) {
-    return this._createUserProvider.verifyActiveToken(userId, token);
+  async verifyActiveTokenProvided(userId: number, token: string) {
+    return this._createUserProvider.tokenVerification(token);
   }
 
   get profileConfiguration(): ConfigType<typeof profileConfig> {
