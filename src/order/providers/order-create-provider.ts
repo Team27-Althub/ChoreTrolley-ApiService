@@ -39,7 +39,7 @@ export class OrderCreateProvider extends OrderBaseProvider {
     /**
      * Initialize paystack
      */
-    const callbackUrl = `${process.env.APP_URL}/payments/verify`;
+    const callbackUrl = `${process.env.BASE_URL}/order/verify`;
     const init = await this.paystackService.initPayment(
       user.email,
       dto.total,
@@ -81,5 +81,9 @@ export class OrderCreateProvider extends OrderBaseProvider {
       const datePart = now.toISOString().slice(0, 7).replace(/-/g, '');
       return `${prefix}${datePart}${seq.lastNumber.toString().padStart(4, '0')}`;
     });
+  }
+
+  getPaystackService() {
+    return this.paystackService;
   }
 }
