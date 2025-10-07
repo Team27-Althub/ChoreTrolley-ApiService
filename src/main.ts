@@ -12,6 +12,8 @@ async function bootstrap() {
     express.static(process.env.UPLOAD_PATH || join(process.cwd(), 'uploads')),
   );
 
+  app.use('/order/webhook', express.raw({ type: 'application/json' }));
+
   /**
    * swagger configuration
    */

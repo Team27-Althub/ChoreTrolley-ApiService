@@ -21,4 +21,8 @@ export class OrderGetListProvider extends OrderBaseProvider {
   async findOrderById(id: number) {
     return this._orderRepository.findOneBy({ id });
   }
+
+  async findOrderByReference(reference: string) {
+    return this._orderRepository.findOneBy({ reference: reference });
+  }
 }
