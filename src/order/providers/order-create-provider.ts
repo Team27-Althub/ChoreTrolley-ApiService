@@ -39,7 +39,7 @@ export class OrderCreateProvider extends OrderBaseProvider {
     /**
      * Initialize paystack
      */
-    const callbackUrl = `${process.env.BASE_URL}/order/verify`;
+    const callbackUrl = `${process.env.FRONTEND_BASE_URL}/payment/verify`;
     const init = await this.paystackService.initPayment(
       user.email,
       dto.total,
