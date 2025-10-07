@@ -43,7 +43,14 @@ export class PaystackService {
       );
 
       const response = await firstValueFrom(response$);
-      return response.data;
+      const data = response.data;
+      if (!data.status || data.data.status !== 'success') {
+        throw new HttpException(
+          'Payment not successful',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      return data.data;
     } catch (error) {
       throw new HttpException(error.response?.data, HttpStatus.BAD_REQUEST);
     }
