@@ -44,6 +44,7 @@ import { Order } from './order/entities/order.entity';
 import { OrderSequence } from './order/entities/order-sequence.entity';
 import { StorageModule } from './storage/storage.module';
 import { StorageMiddleware } from './common/middleware/storage-middleware';
+import { PaystackModule } from './paystack/paystack.module';
 import * as process from 'node:process';
 
 const ENV = process.env.NODE_ENV;
@@ -125,6 +126,7 @@ const ENV = process.env.NODE_ENV;
     RedisModule,
     // StorageModule,
     OrderModule,
+    PaystackModule,
   ],
   controllers: [
     AppController,
