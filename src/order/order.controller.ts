@@ -1,13 +1,15 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  Headers,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Req,
-  Headers,
 } from '@nestjs/common';
 import { OrderService } from './providers/order.service';
 import { CreateOrderDto } from './dtos/CreateOrderDto';
@@ -79,6 +81,48 @@ export class OrderController {
     return await this._orderService.create(createOrderDto);
   }
 
+  @Get('verify/:reference')
+  async verifyReference(@Param('reference') reference: string) {
+    try {
+      const verified = await this._orderService.verify(reference);
+
+      const data = verified.data;
+      const status = data.status;
+      const amount = data.amount / 100;
+      const order = await this._orderService.findByReference(reference);
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      if (order.total !== amount) {
+        throw new BadRequestException('Amount mismatch');
+      }
+
+      if (status === 'success') {
+        await this._orderService.markAsPaid(reference);
+      } else {
+        await this._orderService.markAsFailed(reference);
+      }
+
+      return {
+        message: 'Payment verification completed successfully',
+        status: status,
+        amount: amount,
+        reference: reference,
+      };
+    } catch (error) {
+      console.error('Error verifying payment:', error.message);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Payment verification failed',
+        error.status || HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   @Get('limit/:limit')
   @ApiOperation({ summary: 'Get orders with limit' })
   @ApiResponse({ status: HttpStatus.OK })
@@ -121,30 +165,38 @@ export class OrderController {
     @Req() req: any,
     @Headers('x-paystack-signature') signature: string,
   ) {
-    const secret = process.env.PAYSTACK_SECRET_KEY;
+    try {
+      const secret = process.env.PAYSTACK_SECRET_KEY;
 
-    // Verify signature with raw body
-    const hash = crypto
-      .createHmac('sha512', secret)
-      .update(req.rawBody)
-      .digest('hex');
+      // Verify signature with raw body
+      const hash = crypto
+        .createHmac('sha512', secret)
+        .update(req.rawBody)
+        .digest('hex');
 
-    if (hash !== signature) {
-      throw new HttpException('Invalid signature', HttpStatus.FORBIDDEN);
+      if (hash !== signature) {
+        throw new HttpException('Invalid signature', HttpStatus.FORBIDDEN);
+      }
+
+      const event = req.body;
+
+      if (event.event === 'charge.success') {
+        const { reference } = event.data;
+        await this._orderService.markAsPaid(reference);
+      }
+
+      if (event.event === 'charge.failed') {
+        const { reference } = event.data;
+        await this._orderService.markAsFailed(reference);
+      }
+
+      return { status: HttpStatus.OK, message: 'Webhook received' };
+    } catch (error) {
+      console.error('Webhook error:', error);
+      throw new HttpException(
+        'Webhook processing failed',
+        HttpStatus.BAD_REQUEST,
+      );
     }
-
-    const event = req.body;
-
-    if (event.event === 'charge.success') {
-      const { reference } = event.data;
-      await this._orderService.markAsPaid(reference);
-    }
-
-    if (event.event === 'charge.failed') {
-      const { reference } = event.data;
-      await this._orderService.markAsFailed(reference);
-    }
-
-    return { status: HttpStatus.OK, message: 'Webhook received' };
   }
 }
