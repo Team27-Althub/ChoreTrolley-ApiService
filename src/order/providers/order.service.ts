@@ -20,6 +20,10 @@ export class OrderService {
     return this.orderCreateProvider.createOrderRequest(dto);
   }
 
+  async verify(ref: string) {
+    return this.orderCreateProvider.getPaystackService().verifyPayment(ref);
+  }
+
   async findById(id: number) {
     return this.orderGetListProvider.findOrderById(id);
   }
@@ -42,5 +46,9 @@ export class OrderService {
 
   async markAsFailed(reference: string) {
     return this.orderStatusProvider.markAsFailed(reference);
+  }
+
+  async findByReference(reference: string) {
+    return this.orderGetListProvider.findOrderByReference(reference);
   }
 }
