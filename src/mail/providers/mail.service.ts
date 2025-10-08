@@ -61,7 +61,8 @@ export class MailService {
                 </div>
             </body>
           </html>`;
-    await sendGridMail.send({
+
+    const configureMsg = {
       to: user.email,
       from: {
         email: process.env.SENDGRID_FROM,
@@ -69,6 +70,13 @@ export class MailService {
       },
       subject: subject || 'Welcome to ChoreTrolly',
       html: htmlTemplate,
-    });
+    };
+
+    try {
+      await sendGridMail.send(configureMsg);
+      this.logger.log(`Email sent to ${user.email}`);
+    } catch (error) {
+      this.logger.error(`Failed Sendgrid Email Notification: ${error.message}`);
+    }
   }
 }
