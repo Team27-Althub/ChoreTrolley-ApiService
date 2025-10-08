@@ -49,11 +49,11 @@ export class MailService {
             </head>
             <body>
                 <div class="container" style="background:#fff; padding:24px;border-radius:8px; max-width:500px; margin:40px auto; font-family:Arial,sans-serif;">
-                    <h2>Welcome to ChoreTrolley!</h2>
+                    <h2>Welcome to ChoreTrolly!</h2>
                     <p>Dear ${user.firstName},</p>
                     <p>Thank you for signing up with us. Your email address is ${user.email}.</p>
                     <p>Activate your account <a href="${url}">here</a></p>
-                    <p>Best Regards, ChoreTrolley Team</p>
+                    <p>Best Regards, ChoreTrolly Team</p>
                 </div>
                 <div class="footer" style="text-align:center; margin-top:20px; font-size:12px; color:#aaa;">
                     <p>&copy; ${new Date().getFullYear()} ChoreTrolley. All rights reserved.</p>
