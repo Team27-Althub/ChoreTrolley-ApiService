@@ -6,19 +6,21 @@ import {
   IsString,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from "class-transformer";
 
 export class CreateGroceryDto {
   @IsString()
   @ApiProperty({ description: 'Grocery name', example: 'Fresh Mango' })
   name: string;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
+  @Type(() => Number)
   @ApiProperty({
     description: 'Category Id',
-    example: '1',
+    example: 1,
   })
-  category?: string;
+  category: number;
 
   @IsString()
   @IsNotEmpty()
@@ -30,6 +32,7 @@ export class CreateGroceryDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Type(() => Number)
   @ApiProperty({
     description: 'Amount of the grocery',
     example: '15000',
@@ -38,6 +41,7 @@ export class CreateGroceryDto {
 
   @IsOptional()
   @IsBoolean()
+  @Type(() => Boolean)
   @ApiProperty({
     description: 'Indicates if grocery is sponsored',
     example: 'true or false',
@@ -46,6 +50,7 @@ export class CreateGroceryDto {
 
   @IsOptional()
   @IsBoolean()
+  @Type(() => Boolean)
   @ApiProperty({
     description: 'Is in stock or not',
     example: 'true or false',
@@ -54,6 +59,7 @@ export class CreateGroceryDto {
 
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   @ApiProperty({
     description: 'Ratings for grocery',
     example: '3',
@@ -92,11 +98,12 @@ export class CreateGroceryDto {
   })
   imageUrl?: string;
 
-  /*@IsNumber()
+  @IsNumber()
   @IsNotEmpty()
+  @Type(() => Number)
   @ApiProperty({
     description: 'Grocery provider id',
     example: '2',
   })
-  providerId: number;*/
+  providerId: number;
 }
