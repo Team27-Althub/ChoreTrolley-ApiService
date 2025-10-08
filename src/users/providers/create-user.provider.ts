@@ -12,7 +12,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { HashingProvider } from '../../auth/providers/hashing.provider';
 import { MailService } from '../../mail/providers/mail.service';
 import { OtpService } from '../../otp/otp.service';
-import { OtpType } from '../../otp/types/OtpType';
 import { UserStatus } from '../enums/user-status';
 import { GenerateTokensProvider } from '../../auth/providers/generate-tokens.provider';
 
@@ -93,7 +92,7 @@ export class CreateUserProvider {
     //test email notification using mailTrap test account
     //do not throw error on production should mailTrap fails
     try {
-      await this._mailService.sendUserWelcome(newUser, '', urlActivate);
+      await this._mailService.sendUserWelcome2(newUser, urlActivate);
     } catch (e) {
       throw new RequestTimeoutException(e);
     }
