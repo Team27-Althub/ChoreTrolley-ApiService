@@ -6,8 +6,8 @@ import {
   Param,
   Post,
   Put,
-  Query,
-} from '@nestjs/common';
+  Query, UseInterceptors
+} from "@nestjs/common";
 import { GroceriesService } from './providers/groceries.service';
 import { GetGroceryFilterQueryDto } from './dtos/GetGroceryPaginationQuery';
 import { CreateGroceryDto } from './dtos/CreateGroceryDto';
@@ -15,6 +15,9 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UpdateGroceryDto } from './dtos/UpdateGroceryDto';
 import { SkipResponseWrapper } from '../common/decorators/skip-response.decorator';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from "@nestjs/platform-express";
+import { UploadedFileToDto } from "../common/decorators/uploaded-file-to-dto";
+import { CreateServiceDto } from "../services/dtos/CreateServiceDto";
 
 @Controller('groceries')
 @ApiTags('Groceries Module')
@@ -30,12 +33,13 @@ export class GroceriesController {
 
   @Post('/create-grocery')
   @ApiOperation({ summary: 'Create a new Grocery' })
+  @UseInterceptors(FileInterceptor('imageUrl'))
   @ApiResponse({ status: 201, description: 'Grocery created successfully' })
   async create(
-    @Body() createGroceryDto: CreateGroceryDto,
+    @UploadedFileToDto({ field: 'imageUrl', dto: CreateGroceryDto })dto: CreateGroceryDto,
     @CurrentUser('sub') userId: number,
   ) {
-    return this._groceriesService.createGrocery(createGroceryDto, userId);
+    return this._groceriesService.createGrocery(dto, userId);
   }
 
   @Put('/update-grocery/:id')

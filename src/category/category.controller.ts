@@ -10,6 +10,11 @@ export class CategoryController {
     return await this._categoryService.findAllCategories();
   }
 
+  @Get('/grocery-categories')
+  async getAllGroceryCategories() {
+    return await this._categoryService.findAllGroceryCategories()
+  }
+
   @Get('/:id')
   async getSingleCategory(@Param('id') id: string) {
     return await this._categoryService.getSingleCategory(+id);

@@ -8,6 +8,8 @@ import {
 } from 'typeorm';
 import { ServiceProvider } from '../../services/entities/service-provider.entity';
 import { Review } from '../../review/entities/review.entity';
+import { Category } from "../../category/entities/category.entity";
+import { GroceryCategory } from "../../category/entities/grocery.category.entity";
 
 @Entity('groceries')
 export class Grocery {
@@ -17,8 +19,15 @@ export class Grocery {
   @Column()
   name: string; // e.g. Fresh Tomatoes
 
-  @Column({ nullable: true })
-  category: string; // e.g., Fresh Produce
+  /*@Column({ nullable: true })
+  category: string; // e.g., Fresh Produce*/
+
+  @ManyToOne(() => GroceryCategory, (category) => category.grocery)
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
+
+  @Column({ name: 'categoryId' })
+  categoryId: number;
 
   @Column({ nullable: true, type: 'text' })
   description: string;
