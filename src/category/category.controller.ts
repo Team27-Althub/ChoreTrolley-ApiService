@@ -1,16 +1,18 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { CategoryService } from './category.service';
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller('category')
+@ApiTags('Category')
 export class CategoryController {
   constructor(private readonly _categoryService: CategoryService) {}
 
-  @Get('/')
+  @Get('/service')
   async getAllCategories() {
     return await this._categoryService.findAllCategories();
   }
 
-  @Get('/grocery-categories')
+  @Get('/grocery')
   async getAllGroceryCategories() {
     return await this._categoryService.findAllGroceryCategories()
   }
