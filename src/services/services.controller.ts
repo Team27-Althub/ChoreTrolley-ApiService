@@ -26,6 +26,7 @@ import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { UpdateServiceProviderDto } from "./dtos/UpdateServiceProviderDto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { UploadedFileToDto } from "../common/decorators/uploaded-file-to-dto";
+import { CreateBookingDto } from "./dtos/CreateBookingDto";
 
 @Controller("services")
 @ApiTags("Service Module")
@@ -165,5 +166,21 @@ export class ServicesController {
     @ApiResponse({ status: 404, description: "Service not found" })
     async getSingleService(@Param("id") id: number) {
         return this._services.getSingleService(id);
+    }
+
+    @Post("/booking")
+    async createBooking(@Body() dto: CreateBookingDto, @CurrentUser("sub") userId: number) {
+        Object.assign(dto, { customerId: userId });
+        return this._services.createBooking(dto);
+    }
+
+    @Get("/booking/:id")
+    async findOneBooking(@Param("id") id: number) {
+        return this._services.findOneBooking(id)
+    }
+
+    @Get("/bookings")
+    async getAllBookings() {
+        return this._services.findAllBookings()
     }
 }
