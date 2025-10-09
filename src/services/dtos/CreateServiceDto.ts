@@ -9,7 +9,7 @@ import {
   IsUrl,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from "class-transformer";
 
 export class CreateServiceDto {
   @IsNotEmpty()
@@ -68,13 +68,14 @@ export class CreateServiceDto {
   })
   categoryId: number;
 
-  // @IsNotEmpty()
-  // @IsNumber()
-  // @ApiProperty({
-  //   description: 'Service provider id',
-  //   example: '2',
-  // })
-  // providerId: number;
+  @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
+  @ApiProperty({
+    description: 'Service provider id',
+    example: '2',
+  })
+  providerId: number;
 
   /**
    * Example:
@@ -85,6 +86,16 @@ export class CreateServiceDto {
    */
   @IsOptional()
   @IsObject()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return {}; // fallback to empty object
+      }
+    }
+    return value;
+  })
   @ApiPropertyOptional({
     description: 'Available Hours',
     example: {
