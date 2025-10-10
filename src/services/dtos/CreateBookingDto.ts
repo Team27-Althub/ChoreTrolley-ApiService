@@ -9,9 +9,9 @@ export class CreateBookingDto {
     @IsEmail()
     customerEmail: string;
 
-    @IsNotEmpty()
+    /*@IsNotEmpty()
     @IsNumber()
-    customerId: number;
+    customerId: number;*/
 
     @IsNotEmpty()
     @IsString()

@@ -3,7 +3,7 @@ import {
     Controller,
     Delete,
     Get,
-    Param,
+    Param, Patch,
     Post,
     Put,
     Query,
@@ -169,18 +169,38 @@ export class ServicesController {
     }
 
     @Post("/booking")
+    @ApiBody({
+        description: "Create Booking request body",
+        type: CreateBookingDto,
+        examples: {
+            example1: {
+                summary: "Booking request body",
+                value: {
+                    customerName: "Theophilus Marvellous",
+                    customerEmail: "avengars@gmail.com",
+                    date: "2025-10-01",
+                    timeSlot: "10:30 AM",
+                    serviceId: 4
+                }
+            }
+        }
+    })
     async createBooking(@Body() dto: CreateBookingDto, @CurrentUser("sub") userId: number) {
-        Object.assign(dto, { customerId: userId });
-        return this._services.createBooking(dto);
+        return this._services.createBooking(dto, userId);
     }
 
     @Get("/booking/:id")
     async findOneBooking(@Param("id") id: number) {
-        return this._services.findOneBooking(id)
+        return this._services.findOneBooking(id);
     }
 
     @Get("/bookings")
     async getAllBookings() {
-        return this._services.findAllBookings()
+        return this._services.findAllBookings();
+    }
+
+    @Patch("/booking/:id")
+    async cancelBooking(@Param("id") id: number, @CurrentUser("sub") userId: number) {
+        return this._services.cancelBooking(id, userId);
     }
 }
