@@ -8,14 +8,17 @@ import { CategoryModule } from '../category/category.module';
 import { Service } from './entities/service.entity';
 import { PaginationModule } from '../common/pagination/pagination.module';
 import { ServiceProvider } from './entities/service-provider.entity';
+import { Booking } from "./entities/Booking";
+import { BookingProvider } from "./provider/booking-provider";
+import { User } from "../users/providers/user.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Review, Service, ServiceProvider]),
+    TypeOrmModule.forFeature([Review, Service, ServiceProvider, Booking, User]),
     forwardRef(() => CategoryModule),
     PaginationModule,
   ],
-  providers: [ServicesService, ServicesProvider],
+  providers: [ServicesService, ServicesProvider, BookingProvider],
   controllers: [ServicesController],
   exports: [ServicesService],
 })

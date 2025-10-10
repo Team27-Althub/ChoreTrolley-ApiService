@@ -3,7 +3,7 @@ import {
     Controller,
     Delete,
     Get,
-    Param,
+    Param, Patch,
     Post,
     Put,
     Query,
@@ -26,6 +26,7 @@ import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { UpdateServiceProviderDto } from "./dtos/UpdateServiceProviderDto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { UploadedFileToDto } from "../common/decorators/uploaded-file-to-dto";
+import { CreateBookingDto } from "./dtos/CreateBookingDto";
 
 @Controller("services")
 @ApiTags("Service Module")
@@ -165,5 +166,41 @@ export class ServicesController {
     @ApiResponse({ status: 404, description: "Service not found" })
     async getSingleService(@Param("id") id: number) {
         return this._services.getSingleService(id);
+    }
+
+    @Post("/booking")
+    @ApiBody({
+        description: "Create Booking request body",
+        type: CreateBookingDto,
+        examples: {
+            example1: {
+                summary: "Booking request body",
+                value: {
+                    customerName: "Theophilus Marvellous",
+                    customerEmail: "avengars@gmail.com",
+                    date: "2025-10-01",
+                    timeSlot: "10:30 AM",
+                    serviceId: 4
+                }
+            }
+        }
+    })
+    async createBooking(@Body() dto: CreateBookingDto, @CurrentUser("sub") userId: number) {
+        return this._services.createBooking(dto, userId);
+    }
+
+    @Get("/booking/:id")
+    async findOneBooking(@Param("id") id: number) {
+        return this._services.findOneBooking(id);
+    }
+
+    @Get("/bookings")
+    async getAllBookings() {
+        return this._services.findAllBookings();
+    }
+
+    @Patch("/booking/:id")
+    async cancelBooking(@Param("id") id: number, @CurrentUser("sub") userId: number) {
+        return this._services.cancelBooking(id, userId);
     }
 }

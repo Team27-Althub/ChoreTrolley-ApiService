@@ -9,6 +9,7 @@ import { Exclude } from 'class-transformer';
 import { UserStatus } from '../enums/user-status';
 import { Profile } from '../../profile/entities/profile.entity';
 import { Order } from '../../order/entities/order.entity';
+import { Booking } from 'src/services/entities/Booking';
 
 @Entity('users')
 export class User {
@@ -64,4 +65,7 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
+
+  @OneToMany(() => Booking, (booking) => booking.customer)
+  bookings: Booking[];
 }
