@@ -9,6 +9,7 @@ import {
 import { Category } from '../../category/entities/category.entity';
 import { Review } from '../../review/entities/review.entity';
 import { ServiceProvider } from './service-provider.entity';
+import { Booking } from './Booking';
 
 @Entity()
 export class Service {
@@ -53,4 +54,7 @@ export class Service {
   })
   @JoinColumn({ name: 'provider_id' })
   serviceProvider: ServiceProvider;
+
+  @OneToMany(() => Booking, booking => booking.service, { lazy: true, })
+  bookings: Booking[];
 }
