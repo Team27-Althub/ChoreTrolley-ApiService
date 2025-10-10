@@ -9,6 +9,7 @@ import {
 import { User } from '../../users/providers/user.entity';
 import { Service } from './service.entity';
 import { Grocery } from '../../groceries/entities/Grocery';
+import { Booking } from "./Booking";
 
 @Entity()
 export class ServiceProvider {
@@ -54,4 +55,7 @@ export class ServiceProvider {
 
   @OneToMany(() => Grocery, (grocery) => grocery.serviceProvider)
   groceries: Grocery[];
+
+  @OneToMany(() => Booking, (booking) => booking.serviceProvider)
+  bookings: Booking[]
 }
