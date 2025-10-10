@@ -48,8 +48,8 @@ export class ServicesService {
         return this._serviceProvider.deleteProvidedService(userId, serviceId);
     }
 
-    async createBooking(dto: CreateBookingDto) {
-        return this._bookingProvider.createBooking(dto);
+    async createBooking(dto: CreateBookingDto, userId: number) {
+        return this._bookingProvider.createBooking(dto, userId);
     }
 
     async findAllBookings() {
@@ -58,5 +58,9 @@ export class ServicesService {
 
     async findOneBooking(id: number) {
         return this._bookingProvider.findOne(id);
+    }
+
+    async cancelBooking(id: number, userId: number) {
+        return this._bookingProvider.cancelBooking(id, userId);
     }
 }
