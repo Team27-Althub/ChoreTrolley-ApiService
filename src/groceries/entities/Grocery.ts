@@ -26,8 +26,8 @@ export class Grocery {
   @JoinColumn({ name: 'categoryId' })
   category: Category;
 
-  @Column({ name: 'categoryId' })
-  categoryId: number;
+  /*@Column({ name: 'categoryId' })
+  categoryId: number;*/
 
   @Column({ nullable: true, type: 'text' })
   description: string;
