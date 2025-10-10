@@ -5,6 +5,7 @@ import { Service } from "../entities/service.entity";
 import { CreateBookingDto } from "../dtos/CreateBookingDto";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { User } from "../../users/providers/user.entity";
+import { MailService } from "../../mail/providers/mail.service";
 
 export class BookingProvider {
     constructor(
@@ -13,7 +14,8 @@ export class BookingProvider {
             @InjectRepository(Service)
             private serviceRepository: Repository<Service>,
             @InjectRepository(User)
-            private userRepository: Repository<User>
+            private userRepository: Repository<User>,
+            private readonly _mailService: MailService
     ) {
     }
 
@@ -46,6 +48,14 @@ export class BookingProvider {
         }
 
         const booking = this.bookingRepository.create({ ...dto, customer, service });
+
+        this._mailService.sendBookingNotification(
+                customer,
+                booking,
+                BookingStatus.pending,
+                "ChoreTrolly Booking Notification"
+        );
+
         return await this.bookingRepository.save(booking);
     }
 
@@ -61,7 +71,7 @@ export class BookingProvider {
         const booking = await this.bookingRepository.findOne({
             where: {
                 id,
-                customer: {id: userId}
+                customer: { id: userId }
             }, relations: ["service"]
         });
         if (!booking) {
