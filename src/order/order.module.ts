@@ -14,6 +14,7 @@ import { OrderGetListProvider } from './providers/order-getlist-provider';
 import { OrderSequence } from './entities/order-sequence.entity';
 import { PaystackModule } from '../paystack/paystack.module';
 import { OrderStatusProvider } from './providers/order-status.provider';
+import { Booking } from "../services/entities/Booking";
 
 @Module({
   controllers: [OrderController],
@@ -32,6 +33,7 @@ import { OrderStatusProvider } from './providers/order-status.provider';
       Grocery,
       Service,
       OrderSequence,
+      Booking,
     ]),
     forwardRef(() => PaystackModule),
     PaginationModule,
