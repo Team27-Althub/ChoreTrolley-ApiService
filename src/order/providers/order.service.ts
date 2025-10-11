@@ -28,12 +28,12 @@ export class OrderService {
     return this.orderGetListProvider.findOrderById(id);
   }
 
-  async findAll(filterQuery: OrderFilterQueryDto) {
-    return this.orderGetListProvider.getOrderListPaginated(filterQuery);
+  async findAll(filterQuery: OrderFilterQueryDto, userId: number) {
+    return this.orderGetListProvider.getOrderListPaginated(filterQuery, userId);
   }
 
-  async findByLimit(limit: number) {
-    return this.orderGetListProvider.getLimitedOrderList(limit);
+  async findByLimit(limit: number, userId: number) {
+    return this.orderGetListProvider.getLimitedOrderList(limit, userId);
   }
 
   async cancel(dto: CancelOrderDto, callback?: (order: Order) => void) {
