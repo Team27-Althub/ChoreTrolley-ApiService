@@ -1,28 +1,30 @@
-import { OrderBaseProvider } from './order-base-provider';
-import { OrderFilterQueryDto } from '../dtos/OrderPaginationQuery';
+import { OrderBaseProvider } from "./order-base-provider";
+import { OrderFilterQueryDto } from "../dtos/OrderPaginationQuery";
 
 export class OrderGetListProvider extends OrderBaseProvider {
-  async getOrderListPaginated(filterQuery: OrderFilterQueryDto) {
-    return this._paginationProvider.paginateQuery(
-      {
-        limit: filterQuery.limit,
-        page: filterQuery.page,
-      },
-      this._orderRepository,
-    );
-  }
+	async getOrderListPaginated(filterQuery: OrderFilterQueryDto, userId: number) {
+		return this._paginationProvider.paginateQuery(
+				{
+					limit: filterQuery.limit,
+					page: filterQuery.page,
+					userId: userId
+				},
+				this._orderRepository
+		);
+	}
 
-  async getLimitedOrderList(limit: number) {
-    return this._orderRepository.find({
-      take: limit,
-    });
-  }
+	async getLimitedOrderList(limit: number, userId: number) {
+		return this._orderRepository.find({
+			where: { user: { id: userId } },
+			take: limit
+		});
+	}
 
-  async findOrderById(id: number) {
-    return this._orderRepository.findOneBy({ id });
-  }
+	async findOrderById(id: number) {
+		return this._orderRepository.findOneBy({ id });
+	}
 
-  async findOrderByReference(reference: string) {
-    return this._orderRepository.findOneBy({ reference: reference });
-  }
+	async findOrderByReference(reference: string) {
+		return this._orderRepository.findOneBy({ reference: reference });
+	}
 }
