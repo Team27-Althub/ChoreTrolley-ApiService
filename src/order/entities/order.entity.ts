@@ -3,15 +3,18 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Address } from './address.entity';
 import { Grocery } from '../../groceries/entities/Grocery';
 import { Service } from '../../services/entities/service.entity';
+import { Booking } from 'src/services/entities/Booking';
 
 export enum ShippingMethod {
   ECONOMY = 'Economy',
@@ -65,6 +68,10 @@ export class Order {
   @ManyToMany(() => Service, { lazy: true })
   @JoinTable()
   services: Service[];
+
+  @OneToOne(() => Booking, { eager: true, nullable: true })
+  @JoinColumn({ name: 'booking_id' })
+  booking: Booking;
 
   @Column({ type: 'enum', enum: ShippingMethod })
   shippingMethod: ShippingMethod;
