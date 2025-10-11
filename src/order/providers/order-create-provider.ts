@@ -68,6 +68,13 @@ export class OrderCreateProvider extends OrderBaseProvider {
 				}
 		);
 		await this._orderRepository.save(orderRequest);
+
+		this._mailService.sendItemNotification(
+				user,
+				"ChoreTrolly Order Request",
+				"Your order request has been created."
+		);
+
 		return { order: orderRequest, paymentUrl: init.data.authorization_url };
 	}
 
