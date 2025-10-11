@@ -51,4 +51,8 @@ export class OrderService {
   async findByReference(reference: string) {
     return this.orderGetListProvider.findOrderByReference(reference);
   }
+
+  async cleanUpOldSequences(days: number) {
+    return this.orderCreateProvider.cleanOldSequences(days)
+  }
 }
