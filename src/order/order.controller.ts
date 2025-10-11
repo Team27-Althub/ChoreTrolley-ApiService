@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { OrderService } from './providers/order.service';
@@ -16,7 +17,7 @@ import { CreateOrderDto } from './dtos/CreateOrderDto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { OrderFilterQueryDto } from './dtos/OrderPaginationQuery';
 import { SkipResponseWrapper } from '../common/decorators/skip-response.decorator';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CancelOrderDto } from './providers/order-cancel-provider';
 import * as crypto from 'crypto';
 import {
@@ -79,6 +80,22 @@ export class OrderController {
   ) {
     Object.assign(createOrderDto, { userId });
     return await this._orderService.create(createOrderDto);
+  }
+
+  @Get('cleanup-sequences')
+  @ApiOperation({ summary: 'Clean up old order sequences manually' })
+  @ApiQuery({
+    name: 'days',
+    required: false,
+    type: Number,
+    description: 'Delete sequences older than this number of days (default: 30)',
+  })
+  async cleanupSequences(@Query('days') days?: number) {
+    const numDays = days ? Number(days) : 30;
+    const { deletedCount } = await this._orderService.cleanUpOldSequences(numDays);
+    return {
+      message: `🧹 ${deletedCount} order sequences older than ${numDays} days have been deleted.`,
+    };
   }
 
   @Get('verify/:reference')

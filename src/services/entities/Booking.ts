@@ -1,7 +1,8 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Service } from "./service.entity";
 import { ServiceProvider } from "./service-provider.entity";
 import { User } from "src/users/providers/user.entity";
+import { Order } from "src/order/entities/order.entity";
 
 @Entity()
 export class Booking {
@@ -15,7 +16,7 @@ export class Booking {
     customerEmail: string;
 
     @ManyToOne(() => User, (user) => user.bookings, { lazy: false, nullable: true })
-    @JoinColumn({ name: 'customerId' })
+    @JoinColumn({ name: "customerId" })
     customer: User;
 
     @Column()
@@ -28,13 +29,16 @@ export class Booking {
     service: Service;
 
     @ManyToOne(() => ServiceProvider, (provider) => provider.bookings, {
-        lazy: true,
+        lazy: true
     })
-    @JoinColumn({ name: 'provider_id' })
+    @JoinColumn({ name: "provider_id" })
     serviceProvider: ServiceProvider;
 
-    @Column({ default: 'pending' })
+    @Column({ default: "pending" })
     status: string;
+
+    @OneToOne(() => Order, (order) => order.booking, { nullable: true })
+    order: Order;
 
     @CreateDateColumn()
     createdAt: Date;
