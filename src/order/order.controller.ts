@@ -61,8 +61,9 @@ export class OrderController {
         value: {
           addressId: 45,
           address: '123 Palm Street, Lagos',
-          groceries: [20],
-          services: null,
+          groceries: null,
+          services: [20],
+          bookingId: 12,
           shippingMethod: ShippingMethod,
           paymentMethod: PaymentMethod,
           contractType: ContractType,
