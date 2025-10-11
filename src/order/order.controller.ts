@@ -103,7 +103,7 @@ export class OrderController {
     try {
       const verified = await this._orderService.verify(reference);
 
-      const data = verified.data;
+      const data = verified;
       const status = data.status;
       const amount = data.amount / 100;
       const order = await this._orderService.findByReference(reference);
@@ -112,7 +112,9 @@ export class OrderController {
         throw new NotFoundException('Order not found');
       }
 
-      if (order.total !== amount) {
+      if (Number(order.total) !== Number(amount)) {
+        console.log('AmountMismatch::->', order.total, amount);
+        console.log('Order::', order.id, order.total, order.total === amount)
         throw new BadRequestException('Amount mismatch');
       }
 
